@@ -1,0 +1,28 @@
+POST http://localhost:3002/api/user/login HTTP/1.1
+content-type: application/json
+
+{
+    "nickName": "zYqVq",
+    "password": "xyxyxyxyxyxy"
+}
+
+###
+
+POST http://localhost:3002/api/user/login HTTP/1.1
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2M2ZkZDU3OTgzYzRkZjQxMjhlOTEyYSIsInJvbCI6InN0dWRlbnQiLCJpYXQiOjE3MTU0NjE5NjAsImV4cCI6MTcxNTU0ODM2MH0.BpBO9Qw4zbnpluK3lXvOIzilu3xy9X6jh2ciBuvecFY
+
+{
+    "nickName": "zYqVq",
+    "password": "xyxyxyxyxyxy"
+}
+
+###
+POST http://localhost:3002/api/user/login HTTP/1.1
+content-type: application/json
+
+{
+    "nickName": "sample",
+    "password": "Wed",
+    "rol":"God"
+}
