@@ -15,8 +15,8 @@ export const login = async ( req:Request, res:Response ) =>{
     try{
         const cleanBody = matchedData(req);
         const headerAuth = req.headers.authorization;
-        const foundUser =  await userModel.findOne({ nickName: cleanBody.nickName })
-        .select('fullname nickname rol password ');
+        const foundUser =  await userModel.findOne({ ci: cleanBody.ci })
+        .select('name ci rol password');
 
         //if user ! exist return error 403
         if(!foundUser) return handleError(res,403,'No Existe el Usuario');
@@ -27,7 +27,8 @@ export const login = async ( req:Request, res:Response ) =>{
          //create jwt payload with user info 
         const jwtPayload : JwtPayload = {
             id: foundUser._id.toString(),
-            nickName: foundUser.nickName,
+            name: foundUser.name,
+            ci:foundUser.ci,
             rol: foundUser.rol,
         }
         //if user is not logger we created a token 

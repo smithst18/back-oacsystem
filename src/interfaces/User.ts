@@ -1,12 +1,10 @@
 
 
 export default interface User {
-    fullName: string;
-    nickName:string
+    name: string;
     password: string;
-    rol: "god" | "admin" | "instructor" | "student";
-    document:string;
-    documentType: "god" | "admin";
+    rol: "admin" | "auditor" | "normal";
+    ci:string;
     birdDate:String;
     phoneNumber:String;
     createdAt: Date;

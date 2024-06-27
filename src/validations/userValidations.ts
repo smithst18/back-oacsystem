@@ -3,7 +3,7 @@ import { validateResult } from '../utils/handleValidators';
 import { Response, Request, NextFunction } from "express";
 
 export const validLogin = [
-    check("nickName")
+    check("ci")
         .exists()
         .withMessage('debe existir')
         .trim()
@@ -11,8 +11,8 @@ export const validLogin = [
         .withMessage('No debe estar vacio')
         .isString()
         .withMessage('debe ser un string')
-        .isLength({min:1,max:30})
-        .withMessage('minimo 1 caracter'),
+        .isLength({min:6,max:20})
+        .withMessage('minimo 1 caracter, max 20 caracteres'),
     check("password")
         .exists()
         .withMessage('debe existir')
@@ -21,8 +21,8 @@ export const validLogin = [
         .withMessage('No debe estar vacio')
         .isString()
         .withMessage('debe ser un string')
-        .isLength({min:1,max:20})
-        .withMessage('minimo 1 max 20 caracteres'),
+        .isLength({min:6,max:30})
+        .withMessage('minimo 6, max 30 caracteres'),
     (req:Request, res:Response, next:NextFunction) => validateResult(req, res, next),
     
 ];

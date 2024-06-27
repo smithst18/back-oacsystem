@@ -2,15 +2,10 @@ import { model, Schema } from "mongoose";
 import  User  from "../interfaces/User"
 
 const userSchema  = new Schema<User> ({
-  fullName:{
+  name:{
     type:String,
     required:true,
     trim:true,
-  },
-  nickName:{
-    type:String,
-    trim:true,
-    default: 'NA'
   },
   password:{
     type:String,
@@ -20,21 +15,15 @@ const userSchema  = new Schema<User> ({
   },
   rol:{
     type:String,
-    enum: ["admin","instructor","student"],
+    enum: ["admin","auditor","normal"],
     required:true,
     trim:true,
   },
-  document:{
+  ci:{
     type:String,
     required:true,
     trim:true,
     unique:true,
-  },
-  documentType:{
-    type:String,
-    required:true,
-    trim:true,
-    enum: ["v","e"],
   },
   birdDate:{
     type:String,
