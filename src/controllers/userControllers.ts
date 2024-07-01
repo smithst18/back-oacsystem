@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 import { matchedData } from "express-validator";
 import { handleError } from "../utils/handleErrors";
 import { signToken, verifyToken } from "../utils/handleJWT";
-import { compare } from "../utils/handlePassword";
+//import { compare } from "../utils/handlePassword";
 import { JwtPayload } from "../interfaces/jwt";
 
 /**
@@ -47,4 +47,30 @@ export const login = async ( req:Request, res:Response ) =>{
 
         return res.status(500).send({ e });
     }
+}
+
+/**
+ * Controller for user register 
+ * @param {*} req 
+ * @param {*} res 
+ */
+
+export const signUp = async ( req:Request, res:Response ) =>{
+  try{
+    const cleanBody = matchedData(req);
+
+    //if the user already exist we go throe error 
+    const userExist = await userModel.findOne({ci:cleanBody.ci}).select("ci _id name")
+
+    if(userExist) return handleError(res,403,"usuario ya registrado");
+    //else we save the user preveiusly validated
+    const savedUser = await userModel.create(cleanBody);
+    //if user created return the user
+    if(savedUser)return res.status(200).send({msg:"user Created",savedUser});
+
+    else return handleError(res,403,"Error al registrar"); 
+    
+  }catch(e){
+    return res.status(500).send({ e });
+  }
 }

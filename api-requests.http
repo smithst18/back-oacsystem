@@ -18,11 +18,14 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2M2ZkZDU3O
 }
 
 ###
-POST http://localhost:3002/api/user/login HTTP/1.1
+POST http://localhost:3002/api/user/signup HTTP/1.1
 content-type: application/json
 
 {
-    "nickName": "sample",
-    "password": "Wed",
-    "rol":"God"
+    "name": "emanuel gonzales",
+    "password": "123456",
+    "birdDate":"18/10/1998",
+    "rol":"auditor",
+    "ci":"27571715",
+    "phoneNumber":"04126022414"
 }

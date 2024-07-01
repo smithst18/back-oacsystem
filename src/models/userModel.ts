@@ -27,13 +27,11 @@ const userSchema  = new Schema<User> ({
   },
   birdDate:{
     type:String,
-    required:true,
     trim:true,
     default: 'NA'
   },
   phoneNumber:{
     type:String,
-    required:true,
     trim:true,
     default: 'NA'
   },
