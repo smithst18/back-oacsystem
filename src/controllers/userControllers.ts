@@ -45,6 +45,6 @@ export const login = async ( req:Request, res:Response ) =>{
 
     }catch(e){
 
-        return res.status(500).send({e:e});
+        return res.status(500).send({ e });
     }
 }

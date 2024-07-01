@@ -8,7 +8,7 @@ const privateKey = process.env.PRIVATE_KEY || 'SgH78/?+_01As'; // Default privat
 // Sign JWT with type annotations and error handling
 export const signToken = (data: JwtPayload): string => {
   try {
-    const token = jwt.sign(data, privateKey, { expiresIn: '1d' }); // Explicitly define 'expiresIn'
+    const token = jwt.sign(data, privateKey, { expiresIn:"12h" }); // Explicitly define 'expiresIn'
     return token;
   } catch (error:any) {
     throw new Error('Error signing JWT token: ' + error.message);
