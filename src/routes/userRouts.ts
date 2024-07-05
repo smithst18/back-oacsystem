@@ -15,4 +15,5 @@ const router = Router();
 //routes definition 
 router.post('/login', validLogin ,userControllers.login);
 router.post('/signup', validSignup ,userControllers.signUp);
+router.get('/getusers/:page',userControllers.getUsers);
 export default router;

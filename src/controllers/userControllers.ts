@@ -16,7 +16,8 @@ export const login = async ( req:Request, res:Response ) =>{
         const cleanBody = matchedData(req);
         const headerAuth = req.headers.authorization;
         const foundUser =  await userModel.findOne({ ci: cleanBody.ci })
-        .select('name ci rol password');
+        .select('name ci rol password')
+        .lean();// Agrega el método lean() para obtener un objeto plano en lugar de un documento de mongoose
 
         //if user ! exist return error 403
         if(!foundUser) return handleError(res,403,'No Existe el Usuario');
@@ -72,5 +73,50 @@ export const signUp = async ( req:Request, res:Response ) =>{
     
   }catch(e){
     return res.status(500).send({ e });
+  }
+}
+
+/**
+ * Get users with pagination 
+ * @param {*} req 
+ * @param {*} res 
+ */
+
+export const getUsers = async ( req:Request, res:Response ) =>{
+  try{
+    //const cleanBody = matchedData(req);
+    const pageSelected = req.params.page;
+    const myCustomLabels = {
+      totalDocs: 'totalDocs',
+      docs: 'users',
+      limit: 'perPage',
+      page: 'currentPage',
+      nextPage: 'next',
+      prevPage: 'prev',
+      totalPages: 'totalPages',
+      pagingCounter: 'pagingCounter',
+      meta: 'paginator',
+    };
+    const options = {
+      page: parseInt(pageSelected),
+      limit: 10,
+      customLabels: myCustomLabels,
+    }
+    const paginatedData =  await userModel.paginate({}, options, (err:any, result:any) => {
+      if (err) {
+        // Maneja el error
+        console.log('tremendo error')
+        return err;
+      }
+
+      //const { docs, totalDocs, totalPages } = result;
+
+    // Haz algo con los documentos paginados
+      return result
+    });
+
+    return res.status(200).send({paginatedData})
+  }catch(error){
+    return res.status(500).send({ error });
   }
 }
