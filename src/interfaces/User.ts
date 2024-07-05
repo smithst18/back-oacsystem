@@ -5,8 +5,9 @@ export interface UserI extends Document {
     password: string;
     rol: "admin" | "auditor" | "normal";
     ci:string;
-    birdDate:String;
-    phoneNumber:String;
+    birdDate:string;
+    phoneNumber:string;
+    deleated:boolean;
     createdAt: Date;
     updatedAt: Date;
   }

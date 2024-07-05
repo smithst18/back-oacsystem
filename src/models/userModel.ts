@@ -36,6 +36,11 @@ const userSchema  = new Schema<UserI>({
     trim:true,
     default: 'NA'
   },
+  deleated:{
+    type:Boolean,
+    trim:true,
+    default:false
+  },
 },{
   timestamps:true,
   versionKey:false,

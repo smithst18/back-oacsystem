@@ -22,22 +22,33 @@ POST http://localhost:3002/api/user/signup HTTP/1.1
 content-type: application/json
 
 {
-    "name": "Emanuel Abreu",
+    "name": "Pedro Gonzales",
     "password": "123456",
     "birdDate":"18/10/1998",
-    "rol":"auditor",
-    "ci":"27571718",
+    "rol":"admin",
+    "ci":"27571716",
     "phoneNumber":"04126022414"
 }
-###
-GET  http://localhost:3002/api/user/getusers HTTP/1.1
+### pagination users
+GET  http://localhost:3002/api/user/getusers/1 HTTP/1.1
+content-type: application/json
+
+
+### update user
+PUT  http://localhost:3002/api/user/updateUser HTTP/1.1
 content-type: application/json
 
 {
-    "name": "Emanuel Abreu",
-    "password": "123456",
-    "birdDate":"18/10/1998",
-    "rol":"auditor",
-    "ci":"27571718",
-    "phoneNumber":"04126022414"
+    "_id" : "66885e41128f5eb2ede6d8a4",
+    "name": "zoar elizabeht",
+    "phoneNumber":"04126022485",
+    "rol":"admin"
+}
+
+### update user
+PUT   http://localhost:3002/api/user/delete HTTP/1.1
+content-type: application/json
+
+{
+    "_id" : "66885e41128f5eb2ede6d8a4"
 }

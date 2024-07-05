@@ -81,3 +81,59 @@ export const validSignup = [
   (req:Request, res:Response, next:NextFunction) => validateResult(req, res, next),
   
 ];
+
+export const validUpdate = [
+
+  check("_id")
+      .exists()
+      .isMongoId()
+      .trim()
+      .notEmpty(),
+  check("ci")
+      .optional()
+      .trim()
+      .isString()
+      .withMessage('debe ser un string')
+      .isLength({min:6,max:8})
+      .withMessage('minimo 6 caracter, max 8 caracteres'),
+  check("password")
+      .optional()
+      .trim()
+      .isString()
+      .withMessage('debe ser un string')
+      .isLength({min:3,max:30})
+      .withMessage('la contrase;a debe tener minimo 3, max 30 caracteres'),
+  check("name")
+      .optional()
+      .trim()
+      .isString()
+      .withMessage('debe ser un string')
+      .isLength({min:4,max:60})
+      .withMessage('minimo 4, max 60 caracteres'),
+  check("rol")
+      .optional()
+      .trim()
+      .isString()
+      .withMessage('debe ser un string'),
+  check("birdDate")
+      .optional()
+      .trim()
+      .isDate({format:"DD/MM/YYYY"}),
+  check("phoneNumber")
+      .optional()
+      .trim()
+      .isString()
+      .withMessage('debe ser un string'),
+  (req:Request, res:Response, next:NextFunction) => validateResult(req, res, next),
+  
+];
+export const validDelete = [
+
+  check("_id")
+      .exists()
+      .isMongoId()
+      .trim()
+      .notEmpty(),
+  (req:Request, res:Response, next:NextFunction) => validateResult(req, res, next),
+  
+];

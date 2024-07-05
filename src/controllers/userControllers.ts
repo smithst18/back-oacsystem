@@ -44,9 +44,9 @@ export const login = async ( req:Request, res:Response ) =>{
             
         }
 
-    }catch(e){
+    }catch(error){
 
-        return res.status(500).send({ e });
+        return res.status(500).send({ msg:"Server error",error });
     }
 }
 
@@ -71,8 +71,8 @@ export const signUp = async ( req:Request, res:Response ) =>{
 
     else return handleError(res,403,"Error al registrar"); 
     
-  }catch(e){
-    return res.status(500).send({ e });
+  }catch(error){
+    return res.status(500).send({ msg:"Server error",error });
   }
 }
 
@@ -102,11 +102,10 @@ export const getUsers = async ( req:Request, res:Response ) =>{
       limit: 10,
       customLabels: myCustomLabels,
     }
-    const paginatedData =  await userModel.paginate({}, options, (err:any, result:any) => {
+    const paginatedData =  await userModel.paginate({ deleated: false }, options, (err:any, result:any) => {
       if (err) {
-        // Maneja el error
-        console.log('tremendo error')
-        return err;
+        
+        return handleError(res,500,"ERROR al paginar en el servidor");
       }
 
       //const { docs, totalDocs, totalPages } = result;
@@ -117,6 +116,44 @@ export const getUsers = async ( req:Request, res:Response ) =>{
 
     return res.status(200).send({paginatedData})
   }catch(error){
-    return res.status(500).send({ error });
+    return res.status(500).send({msg:"Server error",error});
+  }
+}
+
+
+/**
+ * Updated user by id
+ * @param {*} req 
+ * @param {*} res 
+ */
+export const update = async ( req:Request, res:Response ) =>{
+  try{
+    const cleanBody = matchedData(req);
+    const updatedUser = await userModel.findByIdAndUpdate(cleanBody._id,cleanBody,{ runValidators:true, new:true });
+
+    if(updatedUser) return res.status(200).send({updatedUser}); 
+    else return handleError(res,403,"Solicitud invalida Revizar cuerpo de solicitud");
+  }catch(error){
+    return res.status(500).send({ msg:"Server error",error });
+  }
+}
+
+
+/**
+ * deleted user by id
+ * @param {*} req 
+ * @param {*} res 
+ */
+export const deactiveted = async ( req:Request, res:Response ) =>{
+  try{
+    const cleanBody = matchedData(req);
+
+    const deletedUser = await userModel.findByIdAndUpdate(cleanBody._id,{deleated:true},{new:true});
+
+    if(deletedUser) return res.status(200).send({msg:"Usuario Eliminado",deletedUser});
+
+    else handleError(res,403,"Solicitud invalida Revizar cuerpo de solicitud");
+  }catch(error){
+    return res.status(500).send({ msg:"Server error",error });
   }
 }
