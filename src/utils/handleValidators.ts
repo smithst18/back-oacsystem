@@ -10,7 +10,6 @@ import  { validationResult } from 'express-validator';
 
 export const validateResult = (req:Request, res:Response, next:NextFunction) =>{
     try {
-    console.log(req.body)
     validationResult(req).throw();
     return next();
 

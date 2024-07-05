@@ -5,7 +5,7 @@ import bcrypt from 'bcrypt';
  * @param {*} unHashedPass 
  * @returns 
  */
-export const encrypt = async (unHashedPass:string) =>{
+export const encrypt = async ( unHashedPass:string ) =>{
     const saltRounds = 10;
     try{
         const salt = await bcrypt.genSalt(saltRounds);
@@ -24,10 +24,10 @@ export const encrypt = async (unHashedPass:string) =>{
  * @param {*} hashedPass 
  * @returns 
  */
-export const compare =  async (unHashedPass:string,hashedPass:string) =>{
+export const compare =  async ( unHashedPass:string, hashedPass:string ) =>{
     
     try{
-        const match = bcrypt.compare(unHashedPass, hashedPass);
+        const match = await bcrypt.compare(unHashedPass, hashedPass);
         return match;
     }catch(e){
         console.log(e);

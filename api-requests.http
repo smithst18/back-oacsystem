@@ -18,11 +18,37 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2M2ZkZDU3O
 }
 
 ###
-POST http://localhost:3002/api/user/login HTTP/1.1
+POST http://localhost:3002/api/user/signup HTTP/1.1
 content-type: application/json
 
 {
-    "nickName": "sample",
-    "password": "Wed",
-    "rol":"God"
+    "name": "Pedro Gonzales",
+    "password": "123456",
+    "birdDate":"18/10/1998",
+    "rol":"admin",
+    "ci":"27571716",
+    "phoneNumber":"04126022414"
+}
+### pagination users
+GET  http://localhost:3002/api/user/getusers/1 HTTP/1.1
+content-type: application/json
+
+
+### update user
+PUT  http://localhost:3002/api/user/updateUser HTTP/1.1
+content-type: application/json
+
+{
+    "_id" : "66885e41128f5eb2ede6d8a4",
+    "name": "zoar elizabeht",
+    "phoneNumber":"04126022485",
+    "rol":"admin"
+}
+
+### update user
+PUT   http://localhost:3002/api/user/delete HTTP/1.1
+content-type: application/json
+
+{
+    "_id" : "66885e41128f5eb2ede6d8a4"
 }
