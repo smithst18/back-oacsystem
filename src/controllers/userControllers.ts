@@ -129,10 +129,19 @@ export const getUsers = async ( req:Request, res:Response ) =>{
 export const update = async ( req:Request, res:Response ) =>{
   try{
     const cleanBody = matchedData(req);
-    const updatedUser = await userModel.findByIdAndUpdate(cleanBody._id,cleanBody,{ runValidators:true, new:true });
 
-    if(updatedUser) return res.status(200).send({updatedUser}); 
-    else return handleError(res,403,"Solicitud invalida Revizar cuerpo de solicitud");
+    const existAllready = await userModel.findOne({
+      ci:cleanBody.ci,
+      _id: { $ne: cleanBody._id }
+    });
+
+    if(existAllready) return handleError(res,403,"Usuario ya registrado");
+    else{
+      const updatedUser = await userModel.findByIdAndUpdate(cleanBody._id,cleanBody,{ runValidators:true, new:true });
+      if(updatedUser) return res.status(200).send({updatedUser}); 
+      else return handleError(res,403,"Solicitud invalida Revizar cuerpo de solicitud");
+    }
+
   }catch(error){
     return res.status(500).send({ msg:"Server error",error });
   }
@@ -152,7 +161,7 @@ export const deactiveted = async ( req:Request, res:Response ) =>{
 
     if(deletedUser) return res.status(200).send({msg:"Usuario Eliminado",deletedUser});
 
-    else handleError(res,403,"Solicitud invalida Revizar cuerpo de solicitud");
+    else handleError(res,403,"Solicitud invalida Usuario no encontrado");
   }catch(error){
     return res.status(500).send({ msg:"Server error",error });
   }

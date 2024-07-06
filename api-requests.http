@@ -45,7 +45,7 @@ content-type: application/json
     "rol":"admin"
 }
 
-### update user
+### softdelete user
 PUT   http://localhost:3002/api/user/delete HTTP/1.1
 content-type: application/json
 

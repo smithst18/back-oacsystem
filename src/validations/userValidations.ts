@@ -131,9 +131,12 @@ export const validDelete = [
 
   check("_id")
       .exists()
+      .withMessage('debe existir')
       .isMongoId()
+      .withMessage('debe ser mongoId')
       .trim()
-      .notEmpty(),
+      .notEmpty()
+      .withMessage('debe estar vacio'),
   (req:Request, res:Response, next:NextFunction) => validateResult(req, res, next),
   
 ];
