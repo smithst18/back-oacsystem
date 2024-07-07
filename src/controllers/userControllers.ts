@@ -157,7 +157,10 @@ export const deactiveted = async ( req:Request, res:Response ) =>{
   try{
     const cleanBody = matchedData(req);
 
-    const deletedUser = await userModel.findByIdAndUpdate(cleanBody._id,{deleated:true},{new:true});
+    const deletedUser = await userModel.findOneAndUpdate({
+      _id:cleanBody._id,
+      deleated: { $ne: true }
+    },{deleated:true},{new:true});
 
     if(deletedUser) return res.status(200).send({msg:"Usuario Eliminado",deletedUser});
 
