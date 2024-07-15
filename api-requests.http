@@ -52,3 +52,36 @@ content-type: application/json
 {
     "_id" : "66885e41128f5eb2ede6d8a4"
 }
+### getAll categories to use  form select
+GET    http://localhost:3002/api/categories/getAll HTTP/1.1
+content-type: application/json
+
+
+### getAll subcategories by category id for  form select
+GET    http://localhost:3002/api/subcategories/getAllByCategory/66885e41128f5eb2ede6d8a5 HTTP/1.1
+content-type: application/json
+
+
+### save category
+POST http://localhost:3002/api/cases/save HTTP/1.1
+content-type: application/json
+
+{
+  "analistaId" : "66885e41128f5eb2ede6d8a4",
+  "categoriaId" : "66885e41128f5eb2ede6d8a2",
+  "subCategoriaId" : "66885e41128f5eb2ede6d8a1",
+  "cedulaBeneficiario" : "qweeqwqew",
+  "cedulaSolicitante" : "qewewqeqw",
+  "edad" : "3-11",
+  "estado" : "Colívar",
+  "genero" : "m",
+  "municipio" : "eqwwqeqweqw",
+  "nombreBeneficiario" : "eqeqwqew",
+  "nombreSolicitante" : "weqqweewq",
+  "parroquia" : "eqwewqeqwewq",
+  "prioridad" : "noUrgente-noImportante",
+  "remitente" : "sala situacional",
+  "sector" : "eqwewqeqwewq",
+  "telefonoBeneficiario" : "eqweqwqew",
+  "tipoBeneficiario" : "pescador"
+}

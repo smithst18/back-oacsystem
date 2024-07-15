@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document, Model } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 import type { UserI } from "../interfaces/User";
 import paginate from 'mongoose-paginate-v2';
 
