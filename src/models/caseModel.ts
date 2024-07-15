@@ -76,7 +76,6 @@ const caseSchema  = new Schema<CaseI>({
   },
   subCategoriaId:{
     type:Schema.Types.ObjectId,
-    required:true,
     trim:true,
   },
   prioridad:{

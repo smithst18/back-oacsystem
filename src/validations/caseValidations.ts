@@ -127,8 +127,7 @@ export const validCase = [
     .withMessage('debe ser mongoid'),
 
   check("subCategoriaId")
-    .exists()
-    .withMessage('debe existir')
+    .optional()
     .isMongoId()
     .withMessage('debe ser mongoid'),
 
