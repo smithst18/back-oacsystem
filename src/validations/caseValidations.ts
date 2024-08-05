@@ -148,3 +148,165 @@ export const validCase = [
     (req:Request, res:Response, next:NextFunction) => validateResult(req, res, next),
   
 ];
+export const validOptionalCase = [
+  
+  check("viaResolucion")
+  .optional()
+  .trim()
+  .notEmpty()
+  .withMessage('No debe estar vacío')
+  .isString()
+  .withMessage('debe ser un string'),
+
+  check("enteRedireccionado")
+  .optional()
+  .trim()
+  .notEmpty()
+  .withMessage('No debe estar vacío')
+  .isString()
+  .withMessage('debe ser un string'),
+
+  check("status")
+  .optional()
+  .trim()
+  .notEmpty()
+  .withMessage('No debe estar vacío')
+  .isString()
+  .withMessage('debe ser un string'),
+
+  check("remitente")
+  .optional()
+  .trim()
+  .notEmpty()
+  .withMessage('No debe estar vacío')
+  .isString()
+  .withMessage('debe ser un string'),
+
+  check("nombreSolicitante")
+    .optional()
+    .trim()
+    .notEmpty()
+    .withMessage('No debe estar vacío')
+    .isString()
+    .withMessage('debe ser un string'),
+
+  check("cedulaSolicitante")
+    .optional()
+    .trim()
+    .notEmpty()
+    .withMessage('No debe estar vacío')
+    .isString()
+    .withMessage('debe ser un string'),
+
+  check("nombreBeneficiario")
+    .optional()
+    .trim()
+    .notEmpty()
+    .withMessage('No debe estar vacío')
+    .isString()
+    .withMessage('debe ser un string'),
+
+  check("cedulaBeneficiario")
+    .optional()
+    .trim()
+    .notEmpty()
+    .withMessage('No debe estar vacío')
+    .isString()
+    .withMessage('debe ser un string'),
+
+  check("telefonoBeneficiario")
+    .optional()
+    .trim()
+    .notEmpty()
+    .withMessage('No debe estar vacío')
+    .isString()
+    .withMessage('debe ser un string'),
+
+  check("edad")
+    .optional()
+    .trim()
+    .notEmpty()
+    .withMessage('No debe estar vacío')
+    .isString()
+    .withMessage('debe ser un string'),
+
+  check("genero")
+    .optional()
+    .trim()
+    .notEmpty()
+    .withMessage('No debe estar vacío')
+    .isString()
+    .withMessage('debe ser un string'),
+
+  check("estado")
+    .optional()
+    .trim()
+    .notEmpty()
+    .withMessage('No debe estar vacío')
+    .isString()
+    .withMessage('debe ser un string'),
+
+  check("municipio")
+    .optional()
+    .trim()
+    .notEmpty()
+    .withMessage('No debe estar vacío')
+    .isString()
+    .withMessage('debe ser un string'),
+
+  check("parroquia")
+    .optional()
+    .trim()
+    .notEmpty()
+    .withMessage('No debe estar vacío')
+    .isString()
+    .withMessage('debe ser un string'),
+
+  check("sector")
+    .optional()
+    .trim()
+    .notEmpty()
+    .withMessage('No debe estar vacío')
+    .isString()
+    .withMessage('debe ser un string'),
+
+  check("tipoBeneficiario")
+    .optional()
+    .trim()
+    .notEmpty()
+    .withMessage('No debe estar vacío')
+    .isString()
+    .withMessage('debe ser un string'),
+
+  check("categoriaId")
+    .optional()
+    .isMongoId()
+    .withMessage('debe ser mongoid'),
+
+  check("subCategoriaId")
+    .optional()
+    .isMongoId()
+    .withMessage('debe ser mongoid'),
+
+  check("prioridad")
+    .optional()
+    .trim()
+    .notEmpty()
+    .withMessage('No debe estar vacío')
+    .isString()
+    .withMessage('debe ser un string'),
+
+    (req:Request, res:Response, next:NextFunction) => validateResult(req, res, next),
+  
+];
+
+export const validCaseId = [
+
+  check("id")
+    .exists()
+    .withMessage('debe existir')
+    .isMongoId()
+    .withMessage('debe ser mongoid'),
+    (req:Request, res:Response, next:NextFunction) => validateResult(req, res, next),
+  
+];

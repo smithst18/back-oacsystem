@@ -73,10 +73,12 @@ const caseSchema  = new Schema<CaseI>({
     type:Schema.Types.ObjectId,
     required:true,
     trim:true,
+    ref:"Category"
   },
   subCategoriaId:{
     type:Schema.Types.ObjectId,
     trim:true,
+    ref:"Subcategory"
   },
   prioridad:{
     type:String,

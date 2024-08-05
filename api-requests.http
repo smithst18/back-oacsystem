@@ -62,7 +62,7 @@ GET    http://localhost:3002/api/subcategories/getAllByCategory/66885e41128f5eb2
 content-type: application/json
 
 
-### save category
+### save case
 POST http://localhost:3002/api/cases/save HTTP/1.1
 content-type: application/json
 
@@ -85,3 +85,39 @@ content-type: application/json
   "telefonoBeneficiario" : "eqweqwqew",
   "tipoBeneficiario" : "pescador"
 }
+
+### pagination cases
+GET  http://localhost:3002/api/cases/getcases/2 HTTP/1.1
+content-type: application/json
+
+### get caseById
+GET  http://localhost:3002/api/cases/getcaseById/66948448f88bc85862aacbf2 HTTP/1.1
+content-type: application/json
+
+### update Case
+PUT http://localhost:3002/api/cases/update HTTP/1.1
+content-type: application/json
+
+{
+  "analistaId" : "66885e41128f5eb2ede6d8a4",
+  "categoriaId" : "66885e41128f5eb2ede6d8a2",
+  "subCategoriaId" : "66885e41128f5eb2ede6d8a1",
+  "cedulaBeneficiario" : "qweeqwqew",
+  "cedulaSolicitante" : "qewewqeqw",
+  "edad" : "3-11",
+  "estado" : "Colívar",
+  "genero" : "m",
+  "municipio" : "eqwwqeqweqw",
+  "nombreBeneficiario" : "eqeqwqew",
+  "nombreSolicitante" : "weqqweewq",
+  "parroquia" : "eqwewqeqwewq",
+  "prioridad" : "noUrgente-noImportante",
+  "remitente" : "sala situacional",
+  "sector" : "eqwewqeqwewq",
+  "telefonoBeneficiario" : "eqweqwqew",
+  "tipoBeneficiario" : "pescador"
+}
+
+### generalStatics Per Month
+GET http://localhost:3002/api/cases/generalStaticsPerMonth HTTP/1.1
+content-type: application/json
