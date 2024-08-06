@@ -148,6 +148,7 @@ export const validCase = [
     (req:Request, res:Response, next:NextFunction) => validateResult(req, res, next),
   
 ];
+
 export const validOptionalCase = [
   
   check("viaResolucion")
@@ -310,3 +311,27 @@ export const validCaseId = [
     (req:Request, res:Response, next:NextFunction) => validateResult(req, res, next),
   
 ];
+
+export const validCaseSearch = [
+  check("page")
+  .optional()
+  .trim()
+  .notEmpty()
+  .withMessage('No debe estar vacío')
+  .isNumeric()
+  .withMessage('debe ser un numero')
+  .isLength({ min: 1 })
+  .withMessage('Minimo 1 digito'),
+  (req:Request, res:Response, next:NextFunction) => validateResult(req, res, next),
+  check("search")
+  .optional()
+  .trim()
+  .notEmpty()
+  .withMessage('No debe estar vacío')
+  .isString()
+  .withMessage('debe ser un string')
+  .isLength({ min: 5 }),
+  (req:Request, res:Response, next:NextFunction) => validateResult(req, res, next),
+  
+];
+

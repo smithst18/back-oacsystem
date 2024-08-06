@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { matchedData } from "express-validator";
 import  { caseModel }  from "../models";
 import { handleError } from "../utils/handleErrors";
-import { populate } from "dotenv";
+import { ObjectId } from 'mongodb';
 
 /**
  * deleted user by id
@@ -31,8 +31,8 @@ export const save = async ( req:Request, res:Response ) =>{
 
 export const getCases = async ( req:Request, res:Response ) =>{
   try{
-    //const cleanBody = matchedData(req);
-    const pageSelected = req.params.page;
+    const { page , search } = matchedData(req);
+    
     const myCustomLabels = {
       totalDocs: 'totalDocs',
       docs: 'cases',
@@ -46,7 +46,7 @@ export const getCases = async ( req:Request, res:Response ) =>{
     };
 
     const options = {
-      page: parseInt(pageSelected),
+      page: parseInt(page),
       limit: 10,
       customLabels: myCustomLabels,
       select:["_id","remitente","prioridad","status","cedulaBeneficiario","analistaId"],
@@ -56,22 +56,38 @@ export const getCases = async ( req:Request, res:Response ) =>{
         // match: { name: new RegExp('.*h.*', 'i') },
         // sort: { name: -1 }
       }]
-    }
-    ;
-    const paginatedData =  await caseModel.paginate({ }, options, (err:any, result:any) => {
+    };
+
+    let query = {}
+
+    if(search && search != undefined && search != "undefined" && search != null ) {
+      query = {
+        $or: [
+          ...(ObjectId.isValid(search) ? [{ _id: search }] : []), // operador ternario donde se valida si la cadena es un object id valido en caso de cerlo se busca por la id
+          { remitente: { $regex: new RegExp(`^${search}`, "i") } },
+          { nombreSolicitante: { $regex: new RegExp(`^${search}`, "i") } },
+          { cedulaSolicitante: { $regex: new RegExp(`^${search}`, "i") } },
+          { nombreBeneficiario: { $regex: new RegExp(`^${search}`, "i") } },
+          { cedulaBeneficiario: { $regex: new RegExp(`^${search}`, "i") } },
+          { estado: { $regex: new RegExp(`^${search}`, "i") } },
+          { tipoBeneficiario: { $regex: new RegExp(`^${search}`, "i") } },
+        ]
+      }
+    };
+
+    const paginatedData =  await caseModel.paginate(query, options, (err:any, result:any) => {
       if (err) {
         
-        return handleError(res,500,"ERROR al paginar en el servidor");
-      }
-
-      //const { docs, totalDocs, totalPages } = result;
-
-      // Haz algo con los documentos paginados
-      return result
+        return console.log("Error paginando los Datos",err)
+      }else return result
     });
 
-    if(paginatedData)return res.status(200).send({paginatedData});
-    else return handleError(res,404,"No se ha encontrado casos");
+    if(paginatedData && paginatedData.cases && Array.isArray(paginatedData.cases) && paginatedData.cases.length > 0 ) {
+      // console.log(paginatedData);
+      return res.status(200).send({ paginatedData });
+    
+    }else return handleError(res,404,"No se ha encontrado casos");
+
   }catch(error){
     return res.status(500).send({msg:"Server error",error});
   }

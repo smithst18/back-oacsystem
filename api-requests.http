@@ -87,7 +87,7 @@ content-type: application/json
 }
 
 ### pagination cases
-GET  http://localhost:3002/api/cases/getcases/2 HTTP/1.1
+GET  http://localhost:3002/api/cases/getcases/1/669e7c524bfb66aa4aebef42 HTTP/1.1
 content-type: application/json
 
 ### get caseById
