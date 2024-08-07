@@ -1,8 +1,9 @@
 import  { Document, Schema } from 'mongoose';
 
 export interface DiaryI extends Document {
-    data: string,
+    description: string,
     casoId:Schema.Types.ObjectId;
+    userId:Schema.Types.ObjectId;
     createdAt: Date;
     updatedAt: Date;
   }

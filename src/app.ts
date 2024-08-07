@@ -16,9 +16,15 @@ app.use(cors()); // Assuming cors is already imported or a global function
 
 // Routes
 
-    // User routes
-app.use('/api/user', routes.userRouts); // Assuming routes.userRoutes is a valid import
-app.use('/api/cases', routes.casesRouts); // Assuming routes.userRoutes is a valid import
+// user routes
+app.use('/api/user', routes.userRouts); 
+// diary routes
+app.use('/api/diary', routes.diaryRouts); 
+// cases routes
+app.use('/api/cases', routes.casesRouts); 
+// categories routes
 app.use('/api/categories', routes.categoryRouts);
+// subcategories routes
 app.use('/api/subcategories', routes.subcategoryRouts);
+
 export default app; // Export the app instance

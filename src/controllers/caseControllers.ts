@@ -1,8 +1,9 @@
-import { Request, Response } from "express";
+import { query, Request, Response } from "express";
 import { matchedData } from "express-validator";
-import  { caseModel }  from "../models";
+import  { caseModel, userModel }  from "../models";
 import { handleError } from "../utils/handleErrors";
 import { ObjectId } from 'mongodb';
+import { UserI } from "../interfaces/User";
 
 /**
  * deleted user by id
@@ -31,7 +32,7 @@ export const save = async ( req:Request, res:Response ) =>{
 
 export const getCases = async ( req:Request, res:Response ) =>{
   try{
-    const { page , search } = matchedData(req);
+    const { page , search, userId } = matchedData(req);
     
     const myCustomLabels = {
       totalDocs: 'totalDocs',
@@ -58,7 +59,7 @@ export const getCases = async ( req:Request, res:Response ) =>{
       }]
     };
 
-    let query = {}
+    let query = {};
 
     if(search && search != undefined && search != "undefined" && search != null ) {
       query = {
@@ -71,10 +72,24 @@ export const getCases = async ( req:Request, res:Response ) =>{
           { cedulaBeneficiario: { $regex: new RegExp(`^${search}`, "i") } },
           { estado: { $regex: new RegExp(`^${search}`, "i") } },
           { tipoBeneficiario: { $regex: new RegExp(`^${search}`, "i") } },
-        ]
+        ],
       }
+      
     };
 
+    // verificar si el usuario que esta solicitando la data existe y tiene los permisos pertinentes es decir es admin o user normal
+    const userExist = await userModel.findById(userId);
+    //if user dont exist return error
+    if(!userExist) return handleError(res,404,"Usuario inexistente");
+
+    
+    if(userExist.rol == "normal"){
+      query ={
+        ...query,
+        $and:[{ analistaId: userId }]
+      }
+    }
+  
     const paginatedData =  await caseModel.paginate(query, options, (err:any, result:any) => {
       if (err) {
         

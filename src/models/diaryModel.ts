@@ -2,15 +2,22 @@ import mongoose, { Schema } from 'mongoose';
 import type { DiaryI } from "../interfaces/Diary";
 
 const diarySchema  = new Schema<DiaryI>({
-  data:{
+  description:{
     type:String,
     required:true,
     trim:true,
+    minlength:4,
+    maxlength:300
   },
   casoId:{
     type:Schema.Types.ObjectId,
     trim:true,
     ref:"Case"
+  },
+  userId:{
+    type:Schema.Types.ObjectId,
+    trim:true,
+    ref:"User"
   },
 },{
   timestamps:true,

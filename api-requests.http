@@ -7,7 +7,6 @@ content-type: application/json
 }
 
 ###
-
 POST http://localhost:3002/api/user/login HTTP/1.1
 content-type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2M2ZkZDU3OTgzYzRkZjQxMjhlOTEyYSIsInJvbCI6InN0dWRlbnQiLCJpYXQiOjE3MTU0NjE5NjAsImV4cCI6MTcxNTU0ODM2MH0.BpBO9Qw4zbnpluK3lXvOIzilu3xy9X6jh2ciBuvecFY
@@ -86,9 +85,19 @@ content-type: application/json
   "tipoBeneficiario" : "pescador"
 }
 
+
+
+
+
 ### pagination cases
-GET  http://localhost:3002/api/cases/getcases/1/669e7c524bfb66aa4aebef42 HTTP/1.1
+GET  http://localhost:3002/api/cases/getcases/1/66885ec88be77e52bbca9b5b/minis HTTP/1.1
 content-type: application/json
+
+
+
+
+
+
 
 ### get caseById
 GET  http://localhost:3002/api/cases/getcaseById/66948448f88bc85862aacbf2 HTTP/1.1
@@ -120,4 +129,20 @@ content-type: application/json
 
 ### generalStatics Per Month
 GET http://localhost:3002/api/cases/generalStaticsPerMonth HTTP/1.1
+content-type: application/json
+
+
+### save case diary
+POST http://localhost:3002/api/diary/save HTTP/1.1
+content-type: application/json
+
+{
+  "description" : "Texto de prueba donde se deja un mensaje explicativo 4",
+  "casoId" : "66948448f88bc85862aacbf2",
+  "userId" : "66885e41128f5eb2ede6d8a4"
+}
+
+
+### get  case diary
+GET http://localhost:3002/api/diary/getByCaseId/66948448f88bc85862aacbf2 HTTP/1.1
 content-type: application/json

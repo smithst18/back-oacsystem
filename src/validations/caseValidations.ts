@@ -314,24 +314,31 @@ export const validCaseId = [
 
 export const validCaseSearch = [
   check("page")
-  .optional()
-  .trim()
-  .notEmpty()
-  .withMessage('No debe estar vacío')
-  .isNumeric()
-  .withMessage('debe ser un numero')
-  .isLength({ min: 1 })
-  .withMessage('Minimo 1 digito'),
-  (req:Request, res:Response, next:NextFunction) => validateResult(req, res, next),
+    .optional()
+    .trim()
+    .notEmpty()
+    .withMessage('No debe estar vacío')
+    .isNumeric()
+    .withMessage('debe ser un numero')
+    .isLength({ min: 1 })
+    .withMessage('Minimo 1 digito'),
+  
   check("search")
-  .optional()
-  .trim()
-  .notEmpty()
-  .withMessage('No debe estar vacío')
-  .isString()
-  .withMessage('debe ser un string')
-  .isLength({ min: 5 }),
-  (req:Request, res:Response, next:NextFunction) => validateResult(req, res, next),
+    .optional()
+    .trim()
+    .notEmpty()
+    .withMessage('No debe estar vacío')
+    .isString()
+    .withMessage('debe ser un string')
+    .isLength({ min: 5 })
+    .withMessage('debe tener 5 caracteres minimo'),
+
+  check("userId")
+    .exists()
+    .withMessage('debe existir')
+    .isMongoId()
+    .withMessage('debe ser mongoid'),
+    (req:Request, res:Response, next:NextFunction) => validateResult(req, res, next),
   
 ];
 
