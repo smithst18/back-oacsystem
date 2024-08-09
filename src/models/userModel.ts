@@ -1,16 +1,10 @@
-import { model, Schema, Types } from "mongoose";
-import  User  from "../interfaces/User"
+import mongoose, { Schema } from 'mongoose';
+import type { UserI } from "../interfaces/User";
+import paginate from 'mongoose-paginate-v2';
 
-const userSchema  = new Schema<User> ({
-  nickName:{
+const userSchema  = new Schema<UserI>({
+  name:{
     type:String,
-    required:true,
-    trim:true,
-    unique:true,
-  },
-  rol:{
-    type:String,
-    enum: ["God","Admin","Instructor","Student"],
     required:true,
     trim:true,
   },
@@ -18,11 +12,41 @@ const userSchema  = new Schema<User> ({
     type:String,
     required:true,
     trim:true,
-    select:false,//permite quitar la pass de las response de la db
+    select:false,//hide password
+  },
+  rol:{
+    type:String,
+    enum: ["admin","auditor","normal"],
+    required:true,
+    trim:true,
+  },
+  ci:{
+    type:String,
+    required:true,
+    trim:true,
+    unique:true,
+  },
+  birdDate:{
+    type:String,
+    trim:true,
+    default: 'NA'
+  },
+  phoneNumber:{
+    type:String,
+    trim:true,
+    default: 'NA'
+  },
+  deleated:{
+    type:Boolean,
+    trim:true,
+    default:false
   },
 },{
   timestamps:true,
   versionKey:false,
 });
 
-export  const userModel = model('User',userSchema);
+userSchema.plugin(paginate);
+
+
+export const userModel = mongoose.model<UserI,mongoose.PaginateModel<UserI>>('User', userSchema);

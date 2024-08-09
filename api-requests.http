@@ -1,0 +1,148 @@
+POST http://localhost:3002/api/user/login HTTP/1.1
+content-type: application/json
+
+{
+    "nickName": "zYqVq",
+    "password": "xyxyxyxyxyxy"
+}
+
+###
+POST http://localhost:3002/api/user/login HTTP/1.1
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2M2ZkZDU3OTgzYzRkZjQxMjhlOTEyYSIsInJvbCI6InN0dWRlbnQiLCJpYXQiOjE3MTU0NjE5NjAsImV4cCI6MTcxNTU0ODM2MH0.BpBO9Qw4zbnpluK3lXvOIzilu3xy9X6jh2ciBuvecFY
+
+{
+    "nickName": "zYqVq",
+    "password": "xyxyxyxyxyxy"
+}
+
+###
+POST http://localhost:3002/api/user/signup HTTP/1.1
+content-type: application/json
+
+{
+    "name": "Pedro Gonzales",
+    "password": "123456",
+    "birdDate":"18/10/1998",
+    "rol":"admin",
+    "ci":"27571716",
+    "phoneNumber":"04126022414"
+}
+### pagination users
+GET  http://localhost:3002/api/user/getusers/1 HTTP/1.1
+content-type: application/json
+
+
+### update user
+PUT  http://localhost:3002/api/user/updateUser HTTP/1.1
+content-type: application/json
+
+{
+    "_id" : "66885e41128f5eb2ede6d8a4",
+    "name": "zoar elizabeht",
+    "phoneNumber":"04126022485",
+    "rol":"admin"
+}
+
+### softdelete user
+PUT   http://localhost:3002/api/user/delete HTTP/1.1
+content-type: application/json
+
+{
+    "_id" : "66885e41128f5eb2ede6d8a4"
+}
+### getAll categories to use  form select
+GET    http://localhost:3002/api/categories/getAll HTTP/1.1
+content-type: application/json
+
+
+### getAll subcategories by category id for  form select
+GET    http://localhost:3002/api/subcategories/getAllByCategory/66885e41128f5eb2ede6d8a5 HTTP/1.1
+content-type: application/json
+
+
+### save case
+POST http://localhost:3002/api/cases/save HTTP/1.1
+content-type: application/json
+
+{
+  "analistaId" : "66885e41128f5eb2ede6d8a4",
+  "categoriaId" : "66885e41128f5eb2ede6d8a2",
+  "subCategoriaId" : "66885e41128f5eb2ede6d8a1",
+  "cedulaBeneficiario" : "qweeqwqew",
+  "cedulaSolicitante" : "qewewqeqw",
+  "edad" : "3-11",
+  "estado" : "Colívar",
+  "genero" : "m",
+  "municipio" : "eqwwqeqweqw",
+  "nombreBeneficiario" : "eqeqwqew",
+  "nombreSolicitante" : "weqqweewq",
+  "parroquia" : "eqwewqeqwewq",
+  "prioridad" : "noUrgente-noImportante",
+  "remitente" : "sala situacional",
+  "sector" : "eqwewqeqwewq",
+  "telefonoBeneficiario" : "eqweqwqew",
+  "tipoBeneficiario" : "pescador"
+}
+
+
+
+
+
+### pagination cases
+GET  http://localhost:3002/api/cases/getcases/1/66885ec88be77e52bbca9b5b/minis HTTP/1.1
+content-type: application/json
+
+
+
+
+
+
+
+### get caseById
+GET  http://localhost:3002/api/cases/getcaseById/66948448f88bc85862aacbf2 HTTP/1.1
+content-type: application/json
+
+### update Case
+PUT http://localhost:3002/api/cases/update HTTP/1.1
+content-type: application/json
+
+{
+  "analistaId" : "66885e41128f5eb2ede6d8a4",
+  "categoriaId" : "66885e41128f5eb2ede6d8a2",
+  "subCategoriaId" : "66885e41128f5eb2ede6d8a1",
+  "cedulaBeneficiario" : "qweeqwqew",
+  "cedulaSolicitante" : "qewewqeqw",
+  "edad" : "3-11",
+  "estado" : "Colívar",
+  "genero" : "m",
+  "municipio" : "eqwwqeqweqw",
+  "nombreBeneficiario" : "eqeqwqew",
+  "nombreSolicitante" : "weqqweewq",
+  "parroquia" : "eqwewqeqwewq",
+  "prioridad" : "noUrgente-noImportante",
+  "remitente" : "sala situacional",
+  "sector" : "eqwewqeqwewq",
+  "telefonoBeneficiario" : "eqweqwqew",
+  "tipoBeneficiario" : "pescador"
+}
+
+### generalStatics Per Month
+GET http://localhost:3002/api/cases/generalStaticsPerMonth HTTP/1.1
+content-type: application/json
+
+
+### save case diary
+POST http://localhost:3002/api/diary/save HTTP/1.1
+content-type: application/json
+
+{
+  "description" : "Texto de prueba donde se deja un mensaje explicativo 4",
+  "casoId" : "66948448f88bc85862aacbf2",
+  "userId" : "66885e41128f5eb2ede6d8a4"
+}
+
+
+### get  case diary
+GET http://localhost:3002/api/diary/getByCaseId/66948448f88bc85862aacbf2 HTTP/1.1
+content-type: application/json

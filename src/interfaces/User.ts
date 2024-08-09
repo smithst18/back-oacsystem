@@ -1,9 +1,13 @@
+import  { Document } from 'mongoose';
 
-
-export default interface User {
-    nickName: string;
-    rol: "God" | "Admin" | "Instructor" | "Student";
+export interface UserI extends Document {
+    name: string;
     password: string;
+    rol: "admin" | "auditor" | "normal";
+    ci:string;
+    birdDate:string;
+    phoneNumber:string;
+    deleated:boolean;
     createdAt: Date;
     updatedAt: Date;
   }
