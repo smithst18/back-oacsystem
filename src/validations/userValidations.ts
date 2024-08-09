@@ -118,7 +118,7 @@ export const validUpdate = [
   check("birdDate")
       .optional()
       .trim()
-      .isDate({format:"DD/MM/YYYY"}),
+      .isDate({format:"MM/DD/YYYY"}),
   check("phoneNumber")
       .optional()
       .trim()
