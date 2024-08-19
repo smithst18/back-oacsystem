@@ -146,3 +146,8 @@ content-type: application/json
 ### get  case diary
 GET http://localhost:3002/api/diary/getByCaseId/66948448f88bc85862aacbf2 HTTP/1.1
 content-type: application/json
+
+
+### get  case diary
+GET http://localhost:3002/api/cases/getCasesInExcel HTTP/1.1
+content-type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet

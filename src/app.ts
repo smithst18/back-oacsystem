@@ -23,8 +23,8 @@ app.use('/api/diary', routes.diaryRouts);
 // cases routes
 app.use('/api/cases', routes.casesRouts); 
 // categories routes
-app.use('/api/categories', routes.categoryRouts);
+app.use('/api/subCategories', routes.subcategoryRouts);
 // subcategories routes
-app.use('/api/subcategories', routes.subcategoryRouts);
+app.use('/api/types', routes.typesRouts);
 
-export default app; // Export the app instance
+export default app;

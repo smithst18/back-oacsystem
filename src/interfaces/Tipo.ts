@@ -1,8 +1,8 @@
 import  { Document, Schema } from 'mongoose';
 
-export interface CategoryI extends Document {
+export interface TipoI extends Document {
     name: string,
-    subCategoriasId:[Schema.Types.ObjectId];
+    subcategoriaId:Schema.Types.ObjectId;
     createdAt: Date;
     updatedAt: Date;
   }

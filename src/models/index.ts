@@ -1,14 +1,14 @@
 import  { userModel }  from "./userModel";
 import  { caseModel }  from "./caseModel";
-import  { categoryModel }  from "./categoryModel";
-import { subcategoryModel } from "./subCategoryModel";
+import  { subcategoryModel }  from "./subcategoryModel";
+import { typeModel } from "./typeModel";
 import { diaryModel } from "./diaryModel";
 
 export { 
     userModel,
     caseModel,
-    categoryModel,
     subcategoryModel,
+    typeModel,
     diaryModel
 
 }

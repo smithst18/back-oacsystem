@@ -2,7 +2,7 @@ import { check } from "express-validator";
 import { validateResult } from '../utils/handleValidators';
 import { Response, Request, NextFunction } from "express";
 
-export const validsubcategoriesList = [
+export const validtypesList = [
     check("_id")
         .exists()
         .withMessage('debe existir')

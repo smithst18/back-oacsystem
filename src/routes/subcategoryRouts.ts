@@ -3,12 +3,15 @@ import { Router } from "express";
 //controllers import
 import { subcategoryControllers } from "../controllers";
 //validations middlewares
-import { 
-  validsubcategoriesList,
-} from "../validations/subcategoryValidations";
+// import { 
+//   validLogin,
+//   validSignup,
+//   validUpdate,
+//   validDelete
+// } from "../validations/userValidations";
 
 const router = Router();
 
 //routes definition 
-router.get('/getAllByCategory/:_id',validsubcategoriesList,subcategoryControllers.getAllByCategory);
+router.get('/getAll',subcategoryControllers.getAll);
 export default router;

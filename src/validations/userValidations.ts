@@ -26,7 +26,6 @@ export const validLogin = [
     (req:Request, res:Response, next:NextFunction) => validateResult(req, res, next),
     
 ];
-
 export const validSignup = [
   check("ci")
       .exists()
@@ -81,7 +80,6 @@ export const validSignup = [
   (req:Request, res:Response, next:NextFunction) => validateResult(req, res, next),
   
 ];
-
 export const validUpdate = [
 
   check("_id")

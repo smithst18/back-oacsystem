@@ -1,12 +1,13 @@
 import { query, Request, Response } from "express";
 import { matchedData } from "express-validator";
-import  { caseModel, userModel }  from "../models";
+import { caseModel, userModel }  from "../models";
 import { handleError } from "../utils/handleErrors";
-import { ObjectId } from 'mongodb';
-import { UserI } from "../interfaces/User";
+import { PipelineStage } from 'mongoose'; 
+import * as ExcelJS from 'exceljs';
+import fs from "fs"
 
 /**
- * deleted user by id
+ * save case
  * @param {*} req 
  * @param {*} res 
  */
@@ -25,7 +26,7 @@ export const save = async ( req:Request, res:Response ) =>{
 }
 
 /**
- * Get users with pagination 
+ * Get users with pagination and search
  * @param {*} req 
  * @param {*} res 
  */
@@ -54,17 +55,63 @@ export const getCases = async ( req:Request, res:Response ) =>{
       populate:[{
         path: 'analistaId',
         select:["name","_id"]
-        // match: { name: new RegExp('.*h.*', 'i') },
-        // sort: { name: -1 }
       }]
     };
 
     let query = {};
+    
+    if(search && search.length == 5){
+      const ultimosCinco = search.toLowerCase();
 
-    if(search && search != undefined && search != "undefined" && search != null ) {
+      const resultados = await caseModel.aggregate([
+        {
+            $match: {
+                $expr: {
+                    $eq: [
+                        {
+                            $substr: [
+                                { $toString: '$_id' },
+                                { $subtract: [{ $strLenCP: { $toString: '$_id' } }, 5] }, // Calcular el índice de inicio
+                                5 // Longitud de la subcadena
+                            ]
+                        },
+                        ultimosCinco // Comparar con los últimos 5 caracteres
+                    ]
+                }
+            }
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "analistaId",
+                foreignField: "_id",
+                as: "analistaId" // Cambié el nombre del campo para evitar confusión
+            }
+        },
+        {
+            $unwind: "$analistaId" // Desenrollar el array para acceder a los campos
+        },
+        {
+            $project: {
+                _id: 1,
+                remitente: 1,
+                prioridad: 1,
+                status: 1,
+                cedulaBeneficiario: 1,
+                "analistaId._id": 1,
+                "analistaId.name": 1
+            }
+        }
+      ]);
+      if(resultados.length >= 1) return res.status(200).send({ paginatedData : { cases : resultados }});
+      else return handleError(res,404,"Ninguna Coincidencia encontrada")
+    }else if(search && search != undefined && search != "undefined" && search != null ) {
+
       query = {
+
         $or: [
-          ...(ObjectId.isValid(search) ? [{ _id: search }] : []), // operador ternario donde se valida si la cadena es un object id valido en caso de cerlo se busca por la id
+          //...(ObjectId.isValid(search) ? [{ _id: search }] : []),  operador ternario donde se valida si la cadena es un object id valido en caso de cerlo se busca por la id
+          // { _id: { $regex: new RegExp(ultimosCinco + '$') } },
           { remitente: { $regex: new RegExp(`^${search}`, "i") } },
           { nombreSolicitante: { $regex: new RegExp(`^${search}`, "i") } },
           { cedulaSolicitante: { $regex: new RegExp(`^${search}`, "i") } },
@@ -73,32 +120,37 @@ export const getCases = async ( req:Request, res:Response ) =>{
           { estado: { $regex: new RegExp(`^${search}`, "i") } },
           { tipoBeneficiario: { $regex: new RegExp(`^${search}`, "i") } },
         ],
+
       }
-      
-    };
+    }
 
     // verificar si el usuario que esta solicitando la data existe y tiene los permisos pertinentes es decir es admin o user normal
+
     const userExist = await userModel.findById(userId);
+    
     //if user dont exist return error
+
     if(!userExist) return handleError(res,404,"Usuario inexistente");
 
     
-    if(userExist.rol == "normal"){
-      query ={
-        ...query,
-        $and:[{ analistaId: userId }]
-      }
-    }
-  
+    //esto aca comentado permite filtrar si el id del usuario coincide con el que creo los cases dependiendo del rol
+    // if(userExist.rol == "normal"){
+    //   query ={
+    //     ...query,
+    //     $and:[{ analistaId: userId }]
+    //   }
+    // }
+
     const paginatedData =  await caseModel.paginate(query, options, (err:any, result:any) => {
       if (err) {
-        
-        return console.log("Error paginando los Datos",err)
+
+        return console.log("Error paginando los Datos",err);
+
       }else return result
     });
 
     if(paginatedData && paginatedData.cases && Array.isArray(paginatedData.cases) && paginatedData.cases.length > 0 ) {
-      // console.log(paginatedData);
+
       return res.status(200).send({ paginatedData });
     
     }else return handleError(res,404,"No se ha encontrado casos");
@@ -114,14 +166,17 @@ export const getCases = async ( req:Request, res:Response ) =>{
  * @param {*} res 
  */
 
+
 export const getcaseById = async ( req:Request, res:Response ) =>{
   try{
-    const cleanBody = matchedData(req);
-    
-    const Case = await caseModel.findById(cleanBody.id).populate(["categoriaId","subCategoriaId","analistaId"]);
-    if(Case) return res.status(200).send({ Case });
+    const { id } = matchedData(req);
+    if(id){
+      const foundCase = await caseModel.findById(id).populate("analistaId tipoId subCategoriaId");
+      if(foundCase) return res.status(200).send({ foundCase });
 
-    else return handleError(res,404,"case not found"); 
+      else return handleError(res,404,"case not found"); 
+      
+    }else return handleError(res,404,"ID necesario"); 
   }catch(error){
     return res.status(500).send({ msg:'Server error',error });
   }
@@ -133,6 +188,7 @@ export const getcaseById = async ( req:Request, res:Response ) =>{
  * @param {*} req 
  * @param {*} res 
  */
+
 
 export const updateCase = async ( req:Request, res:Response ) =>{
   try{
@@ -231,33 +287,23 @@ export const generalStaticsPerMonth = async ( req:Request, res:Response ) =>{
 
     let quantityPerCategory = await caseModel.aggregate([
       {
-        $lookup: {
-          from: "categories",
-          localField: "categoriaId",
-          foreignField: "_id",
-          as: "category"
-        }
-      },
-      {
-        $unwind: "$category"
-      },
-      {
         $group: {
-          _id: "$category.name", // Corrección aquí
-          count: { $sum: 1 }
+          _id: "$categoria", // Agrupa por el campo "category"
+          count: { $sum: 1 } // Cuenta la cantidad de casos en cada categoría
         }
       },
       {
         $project: {
-          _id:0,
-          name: "$_id", // Renombrar _id a name
-          count: 1
+          _id: 0, // Excluye el campo _id del resultado
+          category: "$_id", // Renombra _id a category
+          count: 1 // Mantiene el conteo
         }
       }
     ]);
 
+
     const categories = quantityPerCategory.reduce((acc, curr) => {
-      acc.push(curr.name);
+      acc.push(curr.category);
       return acc;
     }, []);
     
@@ -284,5 +330,204 @@ export const generalStaticsPerMonth = async ( req:Request, res:Response ) =>{
 
   }catch(error){
     return res.status(500).send({ msg:'Server error', error });
+  }
+}
+
+
+/**
+ * GET excel file with cases
+ * @param {*} req 
+ * @param {*} res 
+ */
+
+export const generateExcel = async ( req:Request, res:Response ) =>{
+  try{
+    const currentYear = new Date().getFullYear();
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Casos');
+
+    const mathQuery : any = {
+      createdAt: {
+        $gte: new Date(currentYear, 0, 1), // Filtrar desde el primer día del año actual
+        $lt: new Date(currentYear + 1, 0, 1) // Filtrar hasta el primer día del siguiente año
+      }
+    }
+
+    const pipeline : PipelineStage[] = [
+      {
+        $match: mathQuery
+      },
+      {
+        $lookup: {
+          from: "types",
+          localField: "tipoId",
+          foreignField: "_id",
+          as: "tipo"
+        }
+      },
+      {
+        $unwind: {
+          path: "$tipo",
+          preserveNullAndEmptyArrays: true // Evita eliminar documentos sin coincidencias
+        }
+      },
+      {
+        $lookup: {
+          from: "subcategories",
+          localField: "subCategoriaId",
+          foreignField: "_id",
+          as: "subCategoria"
+        }
+      },
+      {
+        $unwind: {
+          path: "$subCategoria",
+          preserveNullAndEmptyArrays: true // Evita eliminar documentos sin coincidencias
+        }
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "analistaId",
+          foreignField: "_id",
+          as: "analista"
+        }
+      },
+      {
+        $unwind: {
+          path: "$analista",
+          preserveNullAndEmptyArrays: true // Evita eliminar documentos sin coincidencias
+        }
+      },
+      {
+        $addFields: {
+          identificador: {
+            $substrCP: [
+              { $toString: '$_id' },
+              { $subtract: [{ $strLenCP: { $toString: '$_id' } }, 5] },
+              5
+            ],
+          }
+        }
+      },
+      {
+        $project: {
+          identificador: 1,
+          _id: 0,
+          remitente: 1,
+          nombreSolicitante: 1,
+          cedulaSolicitante: 1,
+          nombreBeneficiario: 1,
+          cedulaBeneficiario: 1,
+          telefonoBeneficiario: 1,
+          edad: 1,
+          genero: 1,
+          estado: 1,
+          municipio: 1,
+          parroquia: 1,
+          sector: 1,
+          tipoBeneficiario: 1,
+          categoria: 1,
+          subCategoria: "$subCategoria.name",
+          tipo: "$tipo.name",
+          prioridad: 1,
+          status: 1,
+          viaResolucion: 1,
+          analista: "$analista.name",
+          createdAt: 1,
+          updatedAt: 1
+        }
+      },
+    ];
+    
+    
+    const cases = await caseModel.aggregate(pipeline);
+
+    if(cases && cases.length > 0){
+
+      const reorderedCases = cases.map(doc => {
+        return {
+          Identificador: doc.identificador,
+          Remitente: doc.remitente,
+          "Nombre del solicitante": doc.nombreSolicitante,
+          "Cedula del solicitante": doc.cedulaSolicitante,
+          "Nombre del beneficiario": doc.nombreBeneficiario,
+          "Cedula del beneficiario": doc.cedulaBeneficiario,
+          "Telefono del beneficiario": doc.telefonoBeneficiario,
+          Edad: doc.edad,
+          Genero: doc.genero,
+          Estado: doc.estado,
+          Municipio: doc.municipio,
+          Parroquia: doc.parroquia,
+          Sector: doc.sector,
+          "tipo del Beneficiario": doc.tipoBeneficiario,
+          Categoria: doc.categoria,
+          Subcategoria: doc.subCategoria,
+          Tipo: doc.tipo,
+          Pioridad: doc.prioridad,
+          Estatus: doc.status,
+          "Via de resolucion": doc.viaResolucion,
+          Analista: doc.analista,
+          "Fecha de apertura": doc.createdAt,
+          "Ultima actualizacion": doc.updatedAt
+        };
+      });
+      
+      const claves = Object.keys(reorderedCases[0]);
+      //agregar los titulos
+      worksheet.addRow([...claves]);
+
+      // agregar los datos
+
+      reorderedCases.forEach((elm) => {
+        let data = Object.values(elm);
+        worksheet.addRow(data);
+      })
+
+      // const columns = worksheet.columns;
+      worksheet.columns.forEach((column) => {
+        column.width = 25; // Establece el ancho en 20 unidades
+      });
+
+      // Guardar el archivo
+      await workbook.xlsx.writeFile('src/temp/Listado_De_Casos.xlsx');
+      console.log('Archivo creado exitosamente.');
+
+      const filePath = 'src/temp/Listado_De_Casos.xlsx';
+      
+      if (fs.existsSync(filePath)) {
+        // Configurar las cabeceras de respuesta
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', 'attachment; filename=excel.xlsx');
+    
+        // Leer el archivo y enviarlo como respuesta
+        const readStream = fs.createReadStream(filePath) // leemos el archivo
+        readStream.pipe(res)// le pasamos la res y lo enviamos
+
+        // cuando se termine de enviar lo eliminamos del folder temp
+        readStream.on('end', () => {
+          fs.unlink(filePath, (err) => {
+            if (err) {
+              console.error('Error al borrar el archivo:', err);
+            } else {
+              console.log('Archivo borrado exitosamente.');
+            }
+          });
+        });
+
+        // si ocurre algun error retornamos error 
+        readStream.on('error', (err) => {
+          console.error('Error al leer el archivo:', err);
+          return res.status(500).send('Error al enviar el archivo');
+        });
+
+        return true;
+      } else {
+        return res.status(404).send('El archivo no existe');
+      }
+    }else return handleError(res,404,"No hay registros");
+
+  }catch(error){
+    return res.status(500).send({ msg:'Server error',error });
   }
 }

@@ -119,14 +119,23 @@ export const validCase = [
     .withMessage('No debe estar vacío')
     .isString()
     .withMessage('debe ser un string'),
+    
+  check("categoria")
+    .exists()
+    .withMessage('debe existir')
+    .trim()
+    .notEmpty()
+    .withMessage('No debe estar vacío')
+    .isString()
+    .withMessage('debe ser un string'),
 
-  check("categoriaId")
+  check("subCategoriaId")
     .exists()
     .withMessage('debe existir')
     .isMongoId()
     .withMessage('debe ser mongoid'),
 
-  check("subCategoriaId")
+  check("tipoId")
     .optional()
     .isMongoId()
     .withMessage('debe ser mongoid'),
@@ -279,12 +288,20 @@ export const validOptionalCase = [
     .isString()
     .withMessage('debe ser un string'),
 
-  check("categoriaId")
+  check("categoria")
+  .optional()
+  .trim()
+  .notEmpty()
+  .withMessage('No debe estar vacío')
+  .isString()
+  .withMessage('debe ser un string'),
+
+  check("subCategoriaId")
     .optional()
     .isMongoId()
     .withMessage('debe ser mongoid'),
 
-  check("subCategoriaId")
+  check("tipoId")
     .optional()
     .isMongoId()
     .withMessage('debe ser mongoid'),

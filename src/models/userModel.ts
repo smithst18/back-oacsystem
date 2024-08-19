@@ -3,6 +3,7 @@ import type { UserI } from "../interfaces/User";
 import paginate from 'mongoose-paginate-v2';
 
 const userSchema  = new Schema<UserI>({
+
   name:{
     type:String,
     required:true,
@@ -41,6 +42,7 @@ const userSchema  = new Schema<UserI>({
     trim:true,
     default:false
   },
+  
 },{
   timestamps:true,
   versionKey:false,

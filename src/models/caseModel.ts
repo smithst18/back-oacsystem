@@ -69,16 +69,22 @@ const caseSchema  = new Schema<CaseI>({
     required:true,
     trim:true,
   },
-  categoriaId:{
-    type:Schema.Types.ObjectId,
+  categoria:{
+    type:String,
+    enum: ["peticion","quejas","reclamo","sugerencia","denuncia"],
     required:true,
     trim:true,
-    ref:"Category"
   },
   subCategoriaId:{
     type:Schema.Types.ObjectId,
+    required:true,
     trim:true,
-    ref:"Subcategory"
+    ref:"SubCategory"
+  },
+  tipoId:{
+    type:Schema.Types.ObjectId,
+    trim:true,
+    ref:"Type"
   },
   prioridad:{
     type:String,
