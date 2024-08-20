@@ -482,7 +482,7 @@ export const generateExcel = async ( req:Request, res:Response ) =>{
 
       //generamos la ruta de la carpeta
       const filePath = path.join(__dirname, '../temp/Listado_De_Casos.xlsx');
-      console.log(filePath)
+
       //generamos los titulos 
       const claves = Object.keys(reorderedCases[0]);
 
