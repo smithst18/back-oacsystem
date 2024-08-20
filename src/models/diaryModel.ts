@@ -7,7 +7,7 @@ const diarySchema  = new Schema<DiaryI>({
     required:true,
     trim:true,
     minlength:4,
-    maxlength:300
+    maxlength:10000
   },
   casoId:{
     type:Schema.Types.ObjectId,

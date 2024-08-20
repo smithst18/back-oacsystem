@@ -9,7 +9,7 @@ export const validDiary = [
   .trim()
   .notEmpty()
   .withMessage('No debe estar vacío')
-  .isLength({ min:5, max:300 })
+  .isLength({ min:5, max:10000 })
   .withMessage('min 5 caracteres, max 300 caracteres')
   .isString()
   .withMessage('debe ser un string'),

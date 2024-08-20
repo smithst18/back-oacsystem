@@ -475,17 +475,17 @@ export const generateExcel = async ( req:Request, res:Response ) =>{
       });
 
       //generamos la carpeta si no existe
-      const dir = path.join(__dirname, 'src/temp');
+      const dir = path.join(__dirname, '../temp');
       if (!fs.existsSync(dir)){
           fs.mkdirSync(dir, { recursive: true });
       }
 
       //generamos la ruta de la carpeta
-      const filePath = path.join(__dirname, 'src/temp/Listado_De_Casos.xlsx');
-
+      const filePath = path.join(__dirname, '../temp/Listado_De_Casos.xlsx');
+      console.log(filePath)
       //generamos los titulos 
       const claves = Object.keys(reorderedCases[0]);
-      
+
       //agregar los titulos
       worksheet.addRow([...claves]);
 
@@ -503,10 +503,12 @@ export const generateExcel = async ( req:Request, res:Response ) =>{
 
       // Guardar el archivo
       await workbook.xlsx.writeFile(filePath);
+
       console.log('Archivo creado exitosamente.');
 
       
       if (fs.existsSync(filePath)) {
+        console.log("enviando archivo");
         // Configurar las cabeceras de respuesta
         res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         res.setHeader('Content-Disposition', 'attachment; filename=excel.xlsx');
@@ -542,3 +544,39 @@ export const generateExcel = async ( req:Request, res:Response ) =>{
     return res.status(500).send({ msg:'Server error',error });
   }
 }
+
+
+/**
+ * GET excel file with cases
+ * @param {*} req 
+ * @param {*} res 
+ */
+
+export const generateExcelOneCase = async ( req:Request, res:Response ) =>{
+  try{
+    // Create a new workbook
+    let workbook = new ExcelJS.Workbook();
+
+    // Add a new worksheet to the workbook
+    let worksheet = workbook.addWorksheet('Sheet 1');
+
+    // Add some data to the worksheet
+    worksheet.columns = [
+      { header: 'Id', key: 'id', width: 10 },
+      { header: 'Name', key: 'name', width: 32 },
+      { header: 'D.O.B.', key: 'dob', width: 10 }
+    ];
+
+    worksheet.addRow({id: 1, name: 'John Doe', dob: new Date(1970, 1, 1)});
+    worksheet.addRow({id: 2, name: 'Jane Doe', dob: new Date(1965, 1, 7)});
+
+    // Save the workbook to a file
+    workbook.xlsx.writeFile('Sample.xlsx').then(function() {
+      console.log('File has been written');
+    });
+
+  }catch(error){
+    return res.status(500).send({ msg:'Server error',error });
+  }
+}
+
