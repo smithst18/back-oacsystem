@@ -475,13 +475,13 @@ export const generateExcel = async ( req:Request, res:Response ) =>{
       });
 
       //generamos la carpeta si no existe
-      const dir = path.join(__dirname, 'src/temp');
+      const dir = path.join(__dirname, '../temp');
       if (!fs.existsSync(dir)){
           fs.mkdirSync(dir, { recursive: true });
       }
 
       //generamos la ruta de la carpeta
-      const filePath = path.join(__dirname, 'src/temp/Listado_De_Casos.xlsx');
+      const filePath = path.join(__dirname, '../temp/Listado_De_Casos.xlsx');
 
       //generamos los titulos 
       const claves = Object.keys(reorderedCases[0]);
