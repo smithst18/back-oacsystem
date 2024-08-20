@@ -5,6 +5,7 @@ import { handleError } from "../utils/handleErrors";
 import { PipelineStage } from 'mongoose'; 
 import * as ExcelJS from 'exceljs';
 import fs from "fs"
+import path from 'path';
 
 /**
  * save case
@@ -472,8 +473,19 @@ export const generateExcel = async ( req:Request, res:Response ) =>{
           "Ultima actualizacion": doc.updatedAt
         };
       });
-      
+
+      //generamos la carpeta si no existe
+      const dir = path.join(__dirname, 'src/temp');
+      if (!fs.existsSync(dir)){
+          fs.mkdirSync(dir, { recursive: true });
+      }
+
+      //generamos la ruta de la carpeta
+      const filePath = path.join(__dirname, 'src/temp/Listado_De_Casos.xlsx');
+
+      //generamos los titulos 
       const claves = Object.keys(reorderedCases[0]);
+      
       //agregar los titulos
       worksheet.addRow([...claves]);
 
@@ -490,10 +502,9 @@ export const generateExcel = async ( req:Request, res:Response ) =>{
       });
 
       // Guardar el archivo
-      await workbook.xlsx.writeFile('src/temp/Listado_De_Casos.xlsx');
+      await workbook.xlsx.writeFile(filePath);
       console.log('Archivo creado exitosamente.');
 
-      const filePath = 'src/temp/Listado_De_Casos.xlsx';
       
       if (fs.existsSync(filePath)) {
         // Configurar las cabeceras de respuesta
