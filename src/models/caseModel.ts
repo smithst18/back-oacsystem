@@ -1,8 +1,14 @@
 import mongoose, { Schema, Document, Model } from 'mongoose';
+import { counterModel } from "../models";
 import type { CaseI } from "../interfaces/Case";
 import paginate from 'mongoose-paginate-v2';
 
 const caseSchema  = new Schema<CaseI>({
+  subId:{
+    type:Number,
+    unique:true,
+    trim:true,
+  },
   remitente:{
     type:String,
     enum: ["O.A.C","ministro","viceministerios","sala situacional","entes adscritos","gabinete ministerial","abordaje territorial","venapp","institucion"],
@@ -125,6 +131,30 @@ const caseSchema  = new Schema<CaseI>({
   timestamps:true,
   versionKey:false,
 });
+
+
+// Middleware para incrementar el subId
+caseSchema.pre('save', async function (next) {
+  const doc = this as CaseI;
+  
+  if (doc.isNew) {
+    try {
+      const counter = await counterModel.findOneAndUpdate(
+        { name: 'case_subId' },
+        { $inc: { seq: 1 } },
+        { new: true, upsert: true }
+      );
+
+      doc.subId = counter.seq;
+      next();
+    } catch (error) {
+      next(error as mongoose.CallbackError);
+    }
+  } else {
+    next();
+  }
+});
+
 
 caseSchema.plugin(paginate);
 

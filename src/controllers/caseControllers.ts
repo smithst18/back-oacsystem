@@ -1,4 +1,4 @@
-import { query, Request, Response } from "express";
+import { Request, Response } from "express";
 import { matchedData } from "express-validator";
 import { caseModel, userModel }  from "../models";
 import { handleError } from "../utils/handleErrors";
@@ -6,6 +6,10 @@ import { PipelineStage } from 'mongoose';
 import * as ExcelJS from 'exceljs';
 import fs from "fs"
 import path from 'path';
+import PizZip from "pizzip";
+import docxtemplater from "docxtemplater";
+import { SubCategoryI } from "../interfaces/Subcategory";
+import { camelize } from "../utils/handleCamelcase"
 
 /**
  * save case
@@ -52,7 +56,7 @@ export const getCases = async ( req:Request, res:Response ) =>{
       page: parseInt(page),
       limit: 10,
       customLabels: myCustomLabels,
-      select:["_id","remitente","prioridad","status","cedulaBeneficiario","analistaId"],
+      select:["_id","remitente","prioridad","status","cedulaBeneficiario","analistaId","subId"],
       populate:[{
         path: 'analistaId',
         select:["name","_id"]
@@ -95,6 +99,7 @@ export const getCases = async ( req:Request, res:Response ) =>{
         {
             $project: {
                 _id: 1,
+                subId:1,
                 remitente: 1,
                 prioridad: 1,
                 status: 1,
@@ -172,7 +177,7 @@ export const getcaseById = async ( req:Request, res:Response ) =>{
   try{
     const { id } = matchedData(req);
     if(id){
-      const foundCase = await caseModel.findById(id).populate("analistaId tipoId subCategoriaId");
+      const foundCase = await caseModel.findOne({ subId:id }).populate("analistaId tipoId subCategoriaId");
       if(foundCase) return res.status(200).send({ foundCase });
 
       else return handleError(res,404,"case not found"); 
@@ -196,7 +201,7 @@ export const updateCase = async ( req:Request, res:Response ) =>{
     const cleanBody = matchedData(req);
     if(cleanBody.id){
 
-      const updatedCase =  await caseModel.findByIdAndUpdate(cleanBody.id,cleanBody);
+      const updatedCase =  await caseModel.findOneAndUpdate({subId:cleanBody.id},cleanBody);
 
       if(!updateCase) return handleError(res,403,"Error al Actualizar el caso");
       else return res.status(200).send({updatedCase});
@@ -552,31 +557,78 @@ export const generateExcel = async ( req:Request, res:Response ) =>{
  * @param {*} res 
  */
 
-export const generateExcelOneCase = async ( req:Request, res:Response ) =>{
-  try{
-    // Create a new workbook
-    let workbook = new ExcelJS.Workbook();
+export const generateExcelOneCase = async (req: Request, res: Response) => {
+  try {
+    const { id } = matchedData(req);
+    let foundCase = await caseModel.findOne({ subId: id }).populate("tipoId subCategoriaId");
 
-    // Add a new worksheet to the workbook
-    let worksheet = workbook.addWorksheet('Sheet 1');
+    if (!foundCase) return handleError(res, 404, "No hay Casos disponibles");
 
-    // Add some data to the worksheet
-    worksheet.columns = [
-      { header: 'Id', key: 'id', width: 10 },
-      { header: 'Name', key: 'name', width: 32 },
-      { header: 'D.O.B.', key: 'dob', width: 10 }
-    ];
+    const caseWithSubCategory = foundCase.toObject() as typeof foundCase & { subCategoriaId: SubCategoryI };
 
-    worksheet.addRow({id: 1, name: 'John Doe', dob: new Date(1970, 1, 1)});
-    worksheet.addRow({id: 2, name: 'Jane Doe', dob: new Date(1965, 1, 7)});
+    const filePath = path.join(__dirname, '../temp/REGISTROdeUSUARIO2024.docx');
+    const content = fs.readFileSync(filePath, 'binary');
+    const zip = new PizZip(content);
+    const doc = new docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
 
-    // Save the workbook to a file
-    workbook.xlsx.writeFile('Sample.xlsx').then(function() {
-      console.log('File has been written');
+    doc.render({
+      ID: caseWithSubCategory.subId,
+      FECHA: new Date(caseWithSubCategory.createdAt).toLocaleString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' }),
+      NOMBRE_SOLICITANTE: camelize(caseWithSubCategory.nombreSolicitante),
+      CEDULA_SOLICITANTE: caseWithSubCategory.cedulaSolicitante,
+      CEDULA_BENEFICIARIO: caseWithSubCategory.cedulaBeneficiario,
+      NOMBRE_BENEFICIARIO: camelize(caseWithSubCategory.nombreBeneficiario),
+      EDAD_BENEFICIARIO: caseWithSubCategory.edad,
+      TELEFONO_BENEFICIARIO: caseWithSubCategory.telefonoBeneficiario,
+      PARROQUIA: camelize(caseWithSubCategory.parroquia),
+      MUNICIPIO: camelize(caseWithSubCategory.municipio),
+      ESTADO: camelize(caseWithSubCategory.estado),
+      SECTOR: camelize(caseWithSubCategory.sector),
+      PARTICULAR: caseWithSubCategory.tipoBeneficiario === "particular" ? "☑" : "☐",
+      INSTITUCIONAL: caseWithSubCategory.tipoBeneficiario === "institucional" ? "☑" : "☐",
+      CONPPA: caseWithSubCategory.tipoBeneficiario === "conppa" ? "☑" : "☐",
+      OTRA: caseWithSubCategory.tipoBeneficiario === "acuicultor" ? "☑" : "☐",
+      ESPECIFICADA: caseWithSubCategory.tipoBeneficiario === "acuicultor" ? "Acuicultor" : "",
+      SUBCATEGORIA: caseWithSubCategory.subCategoriaId.name,
+      SUGERENCIA: caseWithSubCategory.categoria === "sugerencia" ? "☑" : "☐",
+      PETICION: caseWithSubCategory.categoria === "peticion" ? "☑" : "☐",
+      DENUNCIA: caseWithSubCategory.categoria === "denuncia" ? "☑" : "☐",
+      RECLAMO: caseWithSubCategory.categoria === "reclamo" ? "☑" : "☐",
+      NOMBRE_OTRA: camelize(caseWithSubCategory.categoria === "quejas" ? "queja" : ""),
     });
 
-  }catch(error){
-    return res.status(500).send({ msg:'Server error',error });
+    const buf = doc.getZip().generate({ type: 'nodebuffer' });
+    const outputFilePath = path.join(__dirname, `../temp/planillaCasoN${caseWithSubCategory.subId}.docx`);
+
+    fs.writeFileSync(outputFilePath, buf);
+
+    if (fs.existsSync(outputFilePath)) {
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+      res.setHeader('Content-Disposition', 'attachment; filename=archivo.docx');
+
+      const readStream = fs.createReadStream(outputFilePath);
+      readStream.pipe(res);
+
+      readStream.on('end', () => {
+        fs.unlink(outputFilePath, (err) => {
+          if (err) {
+            console.error('Error al borrar el archivo:', err);
+          } else {
+            console.log('Archivo borrado exitosamente.');
+          }
+        });
+      });
+
+      readStream.on('error', (err) => {
+        console.error('Error al leer el archivo:', err);
+        res.status(500).send('Error al enviar el archivo');
+      });
+    } else {
+      res.status(404).send('El archivo no existe');
+    }
+  } catch (error) {
+    console.error('Error procesando el documento:', error);
+    res.status(500).send({ msg: 'Server error', error });
   }
-}
+};
 

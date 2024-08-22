@@ -4,13 +4,13 @@ import { Response, Request, NextFunction } from "express";
 
 export const validCase = [
   check("remitente")
-  .exists()
-  .withMessage('debe existir')
-  .trim()
-  .notEmpty()
-  .withMessage('No debe estar vacío')
-  .isString()
-  .withMessage('debe ser un string'),
+    .exists()
+    .withMessage('debe existir')
+    .trim()
+    .notEmpty()
+    .withMessage('No debe estar vacío')
+    .isString()
+    .withMessage('debe ser un string'),
 
   check("nombreSolicitante")
     .exists()
@@ -318,13 +318,26 @@ export const validOptionalCase = [
   
 ];
 
+export const validCasesubId = [
+
+  check("id")
+    .trim()
+    .notEmpty()
+    .withMessage('No debe estar vacío')
+    .isNumeric()
+    .withMessage('debe ser un numero'),
+    (req:Request, res:Response, next:NextFunction) => validateResult(req, res, next),
+  
+];
+
 export const validCaseId = [
 
   check("id")
-    .exists()
-    .withMessage('debe existir')
+    .trim()
+    .notEmpty()
+    .withMessage('No debe estar vacío')
     .isMongoId()
-    .withMessage('debe ser mongoid'),
+    .withMessage('debe ser un mongoid'),
     (req:Request, res:Response, next:NextFunction) => validateResult(req, res, next),
   
 ];

@@ -1,6 +1,7 @@
 import  { Document, Schema } from 'mongoose';
 
 export interface CaseI extends Document {
+    subId:number,
     remitente: "O.A.C" | "ministro" | "viceministerios" | "sala situacional" | "entes adscritos" | "gabinete ministerial" | "abordaje territorial" | "venapp" | "institucion";
     nombreSolicitante:string;
     cedulaSolicitante:string;
