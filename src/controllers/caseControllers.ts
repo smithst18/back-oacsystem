@@ -359,20 +359,21 @@ export const generateExcel = async ( req:Request, res:Response ) =>{
           preserveNullAndEmptyArrays: true // Evita eliminar documentos sin coincidencias
         }
       },
-      {
-        $addFields: {
-          identificador: {
-            $substrCP: [
-              { $toString: '$_id' },
-              { $subtract: [{ $strLenCP: { $toString: '$_id' } }, 5] },
-              5
-            ],
-          }
-        }
-      },
+      // {
+      //   $addFields: {
+      //     identificador: {
+      //       $substrCP: [
+      //         { $toString: '$_id' },
+      //         { $subtract: [{ $strLenCP: { $toString: '$_id' } }, 5] },
+      //         5
+      //       ],
+      //     }
+      //   }
+      // },
       {
         $project: {
-          identificador: 1,
+          // identificador: 1,
+          subId:1,
           _id: 0,
           remitente: 1,
           nombreSolicitante: 1,
@@ -407,7 +408,7 @@ export const generateExcel = async ( req:Request, res:Response ) =>{
 
       const reorderedCases = cases.map(doc => {
         return {
-          Identificador: doc.identificador,
+          ID: doc.subId,
           Remitente: doc.remitente,
           "Nombre del solicitante": doc.nombreSolicitante,
           "Cedula del solicitante": doc.cedulaSolicitante,
