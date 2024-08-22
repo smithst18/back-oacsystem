@@ -65,59 +65,13 @@ export const getCases = async ( req:Request, res:Response ) =>{
 
     let query = {};
     
-    if(search && search.length == 5){
-      const ultimosCinco = search.toLowerCase();
-
-      const resultados = await caseModel.aggregate([
-        {
-            $match: {
-                $expr: {
-                    $eq: [
-                        {
-                            $substr: [
-                                { $toString: '$_id' },
-                                { $subtract: [{ $strLenCP: { $toString: '$_id' } }, 5] }, // Calcular el índice de inicio
-                                5 // Longitud de la subcadena
-                            ]
-                        },
-                        ultimosCinco // Comparar con los últimos 5 caracteres
-                    ]
-                }
-            }
-        },
-        {
-            $lookup: {
-                from: "users",
-                localField: "analistaId",
-                foreignField: "_id",
-                as: "analistaId" // Cambié el nombre del campo para evitar confusión
-            }
-        },
-        {
-            $unwind: "$analistaId" // Desenrollar el array para acceder a los campos
-        },
-        {
-            $project: {
-                _id: 1,
-                subId:1,
-                remitente: 1,
-                prioridad: 1,
-                status: 1,
-                cedulaBeneficiario: 1,
-                "analistaId._id": 1,
-                "analistaId.name": 1
-            }
-        }
-      ]);
-      if(resultados.length >= 1) return res.status(200).send({ paginatedData : { cases : resultados }});
-      else return handleError(res,404,"Ninguna Coincidencia encontrada")
-    }else if(search && search != undefined && search != "undefined" && search != null ) {
+    if(search && search != undefined && search != "undefined" && search != null ) {
 
       query = {
 
         $or: [
           //...(ObjectId.isValid(search) ? [{ _id: search }] : []),  operador ternario donde se valida si la cadena es un object id valido en caso de cerlo se busca por la id
-          // { _id: { $regex: new RegExp(ultimosCinco + '$') } },
+          { subId:search},
           { remitente: { $regex: new RegExp(`^${search}`, "i") } },
           { nombreSolicitante: { $regex: new RegExp(`^${search}`, "i") } },
           { cedulaSolicitante: { $regex: new RegExp(`^${search}`, "i") } },

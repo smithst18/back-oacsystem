@@ -360,8 +360,8 @@ export const validCaseSearch = [
     .withMessage('No debe estar vacío')
     .isString()
     .withMessage('debe ser un string')
-    .isLength({ min: 5 })
-    .withMessage('debe tener 5 caracteres minimo'),
+    .isLength({ min: 1 })
+    .withMessage('debe tener 1 caracteres minimo'),
 
   check("userId")
     .exists()
