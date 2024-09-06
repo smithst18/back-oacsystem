@@ -6,10 +6,10 @@ import { diaryModel } from "./diaryModel";
 import { counterModel } from "./counterModel";
 
 export { 
-    userModel,
-    caseModel,
-    subcategoryModel,
-    typeModel,
-    diaryModel,
-    counterModel
+  userModel,
+  caseModel,
+  subcategoryModel,
+  typeModel,
+  diaryModel,
+  counterModel
 }

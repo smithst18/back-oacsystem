@@ -63,8 +63,8 @@ export const validCase = [
     .trim()
     .notEmpty()
     .withMessage('No debe estar vacío')
-    .isString()
-    .withMessage('debe ser un string'),
+    .isNumeric()
+    .withMessage('debe ser un numero'),
 
   check("genero")
     .exists()
@@ -148,6 +148,16 @@ export const validCase = [
     .withMessage('No debe estar vacío')
     .isString()
     .withMessage('debe ser un string'),
+
+  check("descripcion")
+    .exists()
+    .withMessage('debe existir')
+    .trim()
+    .notEmpty()
+    .withMessage('No debe estar vacío')
+    .isString()
+    .withMessage('debe ser un string'),
+
 
   check("analistaId")
     .exists()
@@ -237,8 +247,8 @@ export const validOptionalCase = [
     .trim()
     .notEmpty()
     .withMessage('No debe estar vacío')
-    .isString()
-    .withMessage('debe ser un string'),
+    .isNumeric()
+    .withMessage('debe ser un number'),
 
   check("genero")
     .optional()

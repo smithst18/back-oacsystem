@@ -8,7 +8,7 @@ export interface CaseI extends Document {
     nombreBeneficiario:string;
     cedulaBeneficiario:string;
     telefonoBeneficiario:string,
-    edad:string,
+    edad:number,
     genero:string,
     estado:string,
     municipio:string,
@@ -24,7 +24,8 @@ export interface CaseI extends Document {
     viaResolucion:string,
     enteRedireccionado:string,
     analistaId:Schema.Types.ObjectId,
-    diario:[Schema.Types.ObjectId]
+    diario:[Schema.Types.ObjectId],
+    descripcion:string,
     createdAt: Date;
     updatedAt: Date;
   }

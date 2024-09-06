@@ -521,7 +521,7 @@ export const generateExcelOneCase = async (req: Request, res: Response) => {
 
     const caseWithSubCategory = foundCase.toObject() as typeof foundCase & { subCategoriaId: SubCategoryI };
 
-    const filePath = path.join(__dirname, '../temp/REGISTROdeUSUARIO2024.docx');
+    const filePath = path.join(__dirname, '../temp/REGISTRO_FORMATO.docx');
     const content = fs.readFileSync(filePath, 'binary');
     const zip = new PizZip(content);
     const doc = new docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
@@ -533,7 +533,8 @@ export const generateExcelOneCase = async (req: Request, res: Response) => {
       CEDULA_SOLICITANTE: caseWithSubCategory.cedulaSolicitante,
       CEDULA_BENEFICIARIO: caseWithSubCategory.cedulaBeneficiario,
       NOMBRE_BENEFICIARIO: camelize(caseWithSubCategory.nombreBeneficiario),
-      EDAD_BENEFICIARIO: caseWithSubCategory.edad,
+      EDAD: caseWithSubCategory.edad,
+      GENERO: caseWithSubCategory.genero,
       TELEFONO_BENEFICIARIO: caseWithSubCategory.telefonoBeneficiario,
       PARROQUIA: camelize(caseWithSubCategory.parroquia),
       MUNICIPIO: camelize(caseWithSubCategory.municipio),
@@ -542,14 +543,15 @@ export const generateExcelOneCase = async (req: Request, res: Response) => {
       PARTICULAR: caseWithSubCategory.tipoBeneficiario === "particular" ? "☑" : "☐",
       INSTITUCIONAL: caseWithSubCategory.tipoBeneficiario === "institucional" ? "☑" : "☐",
       CONPPA: caseWithSubCategory.tipoBeneficiario === "conppa" ? "☑" : "☐",
-      OTRA: caseWithSubCategory.tipoBeneficiario === "acuicultor" ? "☑" : "☐",
-      ESPECIFICADA: caseWithSubCategory.tipoBeneficiario === "acuicultor" ? "Acuicultor" : "",
+      PESCADOR_ACUICULTOR: caseWithSubCategory.tipoBeneficiario === "acuicultor" ? "☑" : "☐",
+      CATEGORIA: caseWithSubCategory.categoria,
       SUBCATEGORIA: caseWithSubCategory.subCategoriaId.name,
-      SUGERENCIA: caseWithSubCategory.categoria === "sugerencia" ? "☑" : "☐",
-      PETICION: caseWithSubCategory.categoria === "peticion" ? "☑" : "☐",
-      DENUNCIA: caseWithSubCategory.categoria === "denuncia" ? "☑" : "☐",
-      RECLAMO: caseWithSubCategory.categoria === "reclamo" ? "☑" : "☐",
+      // SUGERENCIA: caseWithSubCategory.categoria === "sugerencia" ? "☑" : "☐",
+      // PETICION: caseWithSubCategory.categoria === "peticion" ? "☑" : "☐",
+      // DENUNCIA: caseWithSubCategory.categoria === "denuncia" ? "☑" : "☐",
+      // RECLAMO: caseWithSubCategory.categoria === "reclamo" ? "☑" : "☐",
       NOMBRE_OTRA: camelize(caseWithSubCategory.categoria === "quejas" ? "queja" : ""),
+      DESCRIPCION: caseWithSubCategory.descripcion,
     });
 
     const buf = doc.getZip().generate({ type: 'nodebuffer' });

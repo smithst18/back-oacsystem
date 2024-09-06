@@ -41,7 +41,7 @@ const caseSchema  = new Schema<CaseI>({
     trim:true,
   },
   edad:{
-    type:String,
+    type:Number,
     required:true,
     trim:true,
   },
@@ -100,8 +100,8 @@ const caseSchema  = new Schema<CaseI>({
   status:{
     type:String,
     trim:true,
-    enum:["en proceso","cerrado"],
-    default:"en proceso"
+    enum:["contacto inicial","conformacion del expediente","proceso de analisis","notificacion al solicitante","en proceso","seguimiento","cerrado"],
+    default:"contacto inicial"
   },
   fechaRedireccion:{
     type:String,
@@ -126,7 +126,12 @@ const caseSchema  = new Schema<CaseI>({
     type:Schema.Types.ObjectId,
     trim:true,
     ref:"Diary"
-  }]
+  }],
+  descripcion:{
+    type:String,
+    trim:true,
+    required:true
+  }
 },{
   timestamps:true,
   versionKey:false,
