@@ -155,10 +155,10 @@ export const update = async ( req:Request, res:Response ) =>{
  */
 export const deactiveted = async ( req:Request, res:Response ) =>{
   try{
-    const cleanBody = matchedData(req);
+    const { userId } = matchedData(req);
 
     const deletedUser = await userModel.findOneAndUpdate({
-      _id:cleanBody._id,
+      _id:userId,
       deleated: { $ne: true }
     },{deleated:true},{new:true});
 

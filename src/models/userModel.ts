@@ -27,11 +27,6 @@ const userSchema  = new Schema<UserI>({
     trim:true,
     unique:true,
   },
-  birdDate:{
-    type:String,
-    trim:true,
-    default: 'NA'
-  },
   phoneNumber:{
     type:String,
     trim:true,

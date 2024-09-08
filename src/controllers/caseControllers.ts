@@ -66,7 +66,8 @@ export const getCases = async ( req:Request, res:Response ) =>{
     let query = {};
     
     if(search && search != undefined && search != "undefined" && search != null ) {
-
+      //setemaos la pagina de busqueda en 0 para que no haya errores en la respuesta cuando tengamos un query de busqueda
+      options.page = 0;
       query = {
 
         $or: [
@@ -121,7 +122,7 @@ export const getCases = async ( req:Request, res:Response ) =>{
 }
 
 /**
- * Get case by  id ( get ) parma : id 
+ * Get case by  id ( get ) parma : caseSubId 
  * @param {*} req 
  * @param {*} res 
  */
@@ -129,9 +130,9 @@ export const getCases = async ( req:Request, res:Response ) =>{
 
 export const getcaseById = async ( req:Request, res:Response ) =>{
   try{
-    const { id } = matchedData(req);
-    if(id){
-      const foundCase = await caseModel.findOne({ subId:id }).populate("analistaId tipoId subCategoriaId");
+    const { caseSubId } = matchedData(req);
+    if(caseSubId){
+      const foundCase = await caseModel.findOne({ subId:caseSubId }).populate("analistaId tipoId subCategoriaId");
       if(foundCase) return res.status(200).send({ foundCase });
 
       else return handleError(res,404,"case not found"); 
@@ -153,14 +154,31 @@ export const getcaseById = async ( req:Request, res:Response ) =>{
 export const updateCase = async ( req:Request, res:Response ) =>{
   try{
     const cleanBody = matchedData(req);
-    if(cleanBody.id){
+    const { userId, caseSubId } = matchedData(req);
+  
+    const user = await userModel.findById(userId);
 
-      const updatedCase =  await caseModel.findOneAndUpdate({subId:cleanBody.id},cleanBody);
+    // buscamos que el usuario exista si no existe return error
+    if(!user) return handleError(res,404,"No se ha encontrado El usuario");
 
-      if(!updateCase) return handleError(res,403,"Error al Actualizar el caso");
-      else return res.status(200).send({updatedCase});
+    // validamos el status del documento
+    const foundCase = await caseModel.findOne({subId:caseSubId});
+    if(!foundCase) return handleError(res,404,"No existe el caso a actualizar");
 
-    }else return handleError(res,404,"Id inexistente");
+    // validamos el rol del usuario
+    if(foundCase.status === "cerrado" && user.rol !== "auditor"){
+      return handleError(res,403,"No tienes los permisos para editar un caso cerrado");
+    }
+
+    const updatedCase = await caseModel.findOneAndUpdate(
+      { subId: caseSubId },
+      cleanBody,
+      { new: true } // Esta opción devuelve el documento actualizado
+    ).populate("analistaId tipoId subCategoriaId");
+
+    if(!updatedCase) return handleError(res,403,"Error al Actualizar el caso");
+    else return res.status(200).send({updatedCase});
+
   }catch(error){
     return res.status(500).send({ msg:'Server error',error });
   }
@@ -359,17 +377,6 @@ export const generateExcel = async ( req:Request, res:Response ) =>{
           preserveNullAndEmptyArrays: true // Evita eliminar documentos sin coincidencias
         }
       },
-      // {
-      //   $addFields: {
-      //     identificador: {
-      //       $substrCP: [
-      //         { $toString: '$_id' },
-      //         { $subtract: [{ $strLenCP: { $toString: '$_id' } }, 5] },
-      //         5
-      //       ],
-      //     }
-      //   }
-      // },
       {
         $project: {
           // identificador: 1,
@@ -507,15 +514,15 @@ export const generateExcel = async ( req:Request, res:Response ) =>{
 
 
 /**
- * GET excel file with cases
+ * GET word file with expesific case
  * @param {*} req 
  * @param {*} res 
  */
 
 export const generateExcelOneCase = async (req: Request, res: Response) => {
   try {
-    const { id } = matchedData(req);
-    let foundCase = await caseModel.findOne({ subId: id }).populate("tipoId subCategoriaId");
+    const { caseSubId } = matchedData(req);
+    let foundCase = await caseModel.findOne({ subId: caseSubId }).populate("tipoId subCategoriaId");
 
     if (!foundCase) return handleError(res, 404, "No hay Casos disponibles");
 
@@ -537,8 +544,8 @@ export const generateExcelOneCase = async (req: Request, res: Response) => {
       GENERO: caseWithSubCategory.genero,
       TELEFONO_BENEFICIARIO: caseWithSubCategory.telefonoBeneficiario,
       PARROQUIA: camelize(caseWithSubCategory.parroquia),
-      MUNICIPIO: camelize(caseWithSubCategory.municipio),
-      ESTADO: camelize(caseWithSubCategory.estado),
+      MUNICIPIO: camelize(caseWithSubCategory.municipio.replace(/\bmunicipio\b\s*/gi, '')),
+      ESTADO: camelize(caseWithSubCategory.estado.replace(/\bestado\b\s*/gi, '')),
       SECTOR: camelize(caseWithSubCategory.sector),
       PARTICULAR: caseWithSubCategory.tipoBeneficiario === "particular" ? "☑" : "☐",
       INSTITUCIONAL: caseWithSubCategory.tipoBeneficiario === "institucional" ? "☑" : "☐",
@@ -556,6 +563,80 @@ export const generateExcelOneCase = async (req: Request, res: Response) => {
 
     const buf = doc.getZip().generate({ type: 'nodebuffer' });
     const outputFilePath = path.join(__dirname, `../temp/planillaCasoN${caseWithSubCategory.subId}.docx`);
+
+    fs.writeFileSync(outputFilePath, buf);
+
+    if (fs.existsSync(outputFilePath)) {
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+      res.setHeader('Content-Disposition', 'attachment; filename=archivo.docx');
+
+      const readStream = fs.createReadStream(outputFilePath);
+      readStream.pipe(res);
+
+      readStream.on('end', () => {
+        fs.unlink(outputFilePath, (err) => {
+          if (err) {
+            console.error('Error al borrar el archivo:', err);
+          } else {
+            console.log('Archivo borrado exitosamente.');
+          }
+        });
+      });
+
+      readStream.on('error', (err) => {
+        console.error('Error al leer el archivo:', err);
+        res.status(500).send('Error al enviar el archivo');
+      });
+    } else {
+      res.status(404).send('El archivo no existe');
+    }
+  } catch (error) {
+    console.error('Error procesando el documento:', error);
+    res.status(500).send({ msg: 'Server error', error });
+  }
+};
+
+
+/**
+ * GET word file with expesific  closed case
+ * @param {*} req 
+ * @param {*} res 
+ */
+export const generateExcelClosedCase = async (req: Request, res: Response) => {
+  try {
+
+    const { caseSubId } = matchedData(req);
+
+    let foundCase = await caseModel.findOne({ subId: caseSubId, status:'cerrado' });
+
+    if (!foundCase) return handleError(res, 404, "No existe el caso cerrado disponibles");
+
+    const filePath = path.join(__dirname, '../temp/ACTA_DE_CIERRE.docx');
+    const content = fs.readFileSync(filePath, 'binary');
+    const zip = new PizZip(content);
+    const doc = new docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
+
+    doc.render({
+      ID: foundCase.subId,
+      DIA:new Date(foundCase.createdAt).toLocaleString('es-ES', { day: '2-digit' }),
+      MES:new Date(foundCase.createdAt).toLocaleString('es-ES', { month: 'long' }),
+      ANO:new Date(foundCase.createdAt).toLocaleString('es-ES', { year: 'numeric',}),
+      FECHA: new Date(foundCase.createdAt).toLocaleString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' }),
+      NOMBRE_SOLICITANTE: camelize(foundCase.nombreSolicitante),
+      CEDULA_SOLICITANTE: foundCase.cedulaSolicitante,
+      CEDULA_BENEFICIARIO: foundCase.cedulaBeneficiario,
+      NOMBRE_BENEFICIARIO: camelize(foundCase.nombreBeneficiario),
+      CATEGORIA: foundCase.categoria,
+      DESCRIPCION: foundCase.descripcion,
+      FONDO_NEGRO: foundCase.viaResolucion === "servicio desconcentrado fondo negro primero" ? "☑" : "☐",
+      ADMINISTRATIVA: foundCase.viaResolucion === "administrativa" ? "☑" : "☐",
+      REMITIDO: foundCase.viaResolucion === "remitido" ? "☑" : "☐",
+      RECURSOS_PROPIOS: foundCase.viaResolucion === "recursos propios" ? "☑" : "☐",
+      NO_PROCEDE: foundCase.viaResolucion === "no procede" ? "☑" : "☐",
+    });
+
+    const buf = doc.getZip().generate({ type: 'nodebuffer' });
+    const outputFilePath = path.join(__dirname, `../temp/Caso_Cerrado_N${foundCase.subId}.docx`);
 
     fs.writeFileSync(outputFilePath, buf);
 

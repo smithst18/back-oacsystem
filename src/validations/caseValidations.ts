@@ -330,7 +330,7 @@ export const validOptionalCase = [
 
 export const validCasesubId = [
 
-  check("id")
+  check("caseSubId")
     .trim()
     .notEmpty()
     .withMessage('No debe estar vacío')

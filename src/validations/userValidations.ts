@@ -66,11 +66,6 @@ export const validSignup = [
       .isString()
       .withMessage('debe ser un string')
       .default('normal'),
-  check("birdDate")
-      .optional()
-      .trim()
-      .isDate({format:"DD/MM/YYYY"})
-      .default('NA'),
   check("phoneNumber")
       .optional()
       .trim()
@@ -113,10 +108,6 @@ export const validUpdate = [
       .trim()
       .isString()
       .withMessage('debe ser un string'),
-  check("birdDate")
-      .optional()
-      .trim()
-      .isDate({format:"MM/DD/YYYY"}),
   check("phoneNumber")
       .optional()
       .trim()
@@ -125,16 +116,16 @@ export const validUpdate = [
   (req:Request, res:Response, next:NextFunction) => validateResult(req, res, next),
   
 ];
-export const validDelete = [
+export const validUserId = [
 
-  check("_id")
+  check("userId")
       .exists()
-      .withMessage('debe existir')
+      .withMessage('Debe existir')
       .isMongoId()
-      .withMessage('debe ser mongoId')
+      .withMessage('Debe ser mongoId')
       .trim()
       .notEmpty()
-      .withMessage('debe estar vacio'),
+      .withMessage('No debe estar vacio'),
   (req:Request, res:Response, next:NextFunction) => validateResult(req, res, next),
   
 ];

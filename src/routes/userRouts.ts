@@ -9,7 +9,7 @@ import {
   validLogin,
   validSignup,
   validUpdate,
-  validDelete
+  validUserId
 } from "../validations/userValidations";
 
 const router = Router();
@@ -19,6 +19,6 @@ router.post('/login', validLogin ,userControllers.login);
 router.post('/signup', validSignup ,userControllers.signUp);
 router.put('/updateUser', validUpdate ,userControllers.update);
 router.get('/getusers/:page',userControllers.getUsers);
-router.put('/delete',validDelete,userControllers.deactiveted);
+router.put('/delete',validUserId,userControllers.deactiveted);
 
 export default router;
