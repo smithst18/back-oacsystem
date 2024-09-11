@@ -26,6 +26,7 @@ export interface CaseI extends Document {
     analistaId:Schema.Types.ObjectId,
     diario:[Schema.Types.ObjectId],
     descripcion:string,
+    file:string,
     createdAt: Date;
     updatedAt: Date;
   }

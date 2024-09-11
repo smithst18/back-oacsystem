@@ -12,7 +12,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors()); // Assuming cors is already imported or a global function
 
 // Config for public files
-
+app.use('/public',express.static(__dirname + '/public/files'));
 
 // Routes
 

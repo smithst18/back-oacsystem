@@ -131,6 +131,10 @@ const caseSchema  = new Schema<CaseI>({
     type:String,
     trim:true,
     required:true
+  },
+  file:{
+    type:String,
+    trim:true,
   }
 },{
   timestamps:true,

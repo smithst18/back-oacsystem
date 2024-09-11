@@ -12,11 +12,18 @@ import {
   validCaseSearch,
 } from "../validations/caseValidations";
 import { validUserId } from "../validations/userValidations";
+import { uploadFile, multerErrorHandler } from "../middlewares/multer";
 
 const router = Router();
 
 //routes definition 
-router.post('/save', validCase ,caseControllers.save);
+router.post(
+  '/save', // RUTA
+  uploadFile.single('casoPdf'), // MULTER
+  multerErrorHandler, //MULTER ERROR HANDLER
+  validCase, // VALIDATOR
+  caseControllers.save // CONTROLLER
+);
 router.get('/getcases/:page/:userId/:search?',validCaseSearch,caseControllers.getCases);
 router.get('/getcaseById/:caseSubId',validCasesubId,caseControllers.getcaseById);
 router.put('/updateCaseById',validUserId,validCasesubId,validOptionalCase,caseControllers.updateCase);

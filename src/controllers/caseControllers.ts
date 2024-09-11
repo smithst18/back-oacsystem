@@ -10,6 +10,10 @@ import PizZip from "pizzip";
 import docxtemplater from "docxtemplater";
 import { SubCategoryI } from "../interfaces/Subcategory";
 import { camelize } from "../utils/handleCamelcase"
+const pathStorage = `${__dirname}/../public/files`;
+const PUBLIC_URL = process.env.PUBLIC_URL || "http://localhost:3000/public/files";
+
+
 
 /**
  * save case
@@ -19,9 +23,21 @@ import { camelize } from "../utils/handleCamelcase"
 
 export const save = async ( req:Request, res:Response ) =>{
   try{
-    const cleanBody = matchedData(req);
+    const file = req.body.fileName;
+
+    let cleanBody = matchedData(req);
+
+    if (file) {
+      const filePath = `${pathStorage}/${file}`;
+      cleanBody.file = `${PUBLIC_URL}/${file}`;;
+      // Verifica si el archivo realmente existe antes de guardar la ruta en la base de datos.
+      if (!fs.existsSync(filePath)) {
+        return handleError(res, 403, 'Error al registrar, archivo no encontrado');
+      }
+    }
     
-    const savedCase = await caseModel.create(cleanBody)
+    const savedCase = await caseModel.create(cleanBody);
+
     if(savedCase)return res.status(200).send({msg:"user Created",savedCase});
 
     else return handleError(res,403,"Error al registrar"); 
