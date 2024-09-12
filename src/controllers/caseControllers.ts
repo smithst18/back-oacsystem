@@ -29,7 +29,7 @@ export const save = async ( req:Request, res:Response ) =>{
 
     if (file) {
       const filePath = `${pathStorage}/${file}`;
-      cleanBody.file = `${PUBLIC_URL}/${file}`;;
+      cleanBody.file = `${PUBLIC_URL}/${file}`;
       // Verifica si el archivo realmente existe antes de guardar la ruta en la base de datos.
       if (!fs.existsSync(filePath)) {
         return handleError(res, 403, 'Error al registrar, archivo no encontrado');
