@@ -12,6 +12,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors()); // Assuming cors is already imported or a global function
 
 // Config for public files
+        //nombre de la ruta               //ruta carpeta de la cual se esta haciendo recurso publico
 app.use('/public',express.static(__dirname + '/public/files'));
 
 // Routes
