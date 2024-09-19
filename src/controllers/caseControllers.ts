@@ -4,12 +4,12 @@ import { caseModel, userModel }  from "../models";
 import { handleError } from "../utils/handleErrors";
 import { PipelineStage } from 'mongoose'; 
 import * as ExcelJS from 'exceljs';
-import fs from "fs"
+import fs from "fs";
 import path from 'path';
 import PizZip from "pizzip";
 import docxtemplater from "docxtemplater";
 import { SubCategoryI } from "../interfaces/Subcategory";
-import { camelize } from "../utils/handleCamelcase"
+import { camelize } from "../utils/handleCamelcase";
 const pathStorage = `${__dirname}/../public/files`;
 const PUBLIC_URL = process.env.PUBLIC_URL || "http://localhost:3000/public";
 
@@ -530,7 +530,7 @@ export const generateExcel = async ( req:Request, res:Response ) =>{
 
 
 /**
- * GET word file with expesific case
+ * GET word file with expecific case
  * @param {*} req 
  * @param {*} res 
  */

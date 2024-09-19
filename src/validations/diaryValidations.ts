@@ -23,6 +23,15 @@ export const validDiary = [
     .isMongoId()
     .withMessage('debe ser mongoid'),
 
+  check("caseStatus")
+    .exists()
+    .withMessage('debe existir')
+    .trim()
+    .notEmpty()
+    .withMessage('No debe estar vacío')
+    .isString()
+    .withMessage('debe ser un string'),
+
   check("userId")
     .exists()
     .withMessage('debe existir')

@@ -14,6 +14,12 @@ const diarySchema  = new Schema<DiaryI>({
     trim:true,
     ref:"Case"
   },
+  caseStatus:{
+    type:String,
+    trim:true,
+    enum:["contacto inicial","conformacion del expediente","proceso de analisis","notificacion al solicitante","en proceso","seguimiento","cerrado"],
+    default:"contacto inicial"
+  },
   userId:{
     type:Schema.Types.ObjectId,
     trim:true,
