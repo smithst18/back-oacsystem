@@ -384,6 +384,13 @@ export const validCaseSearch = [
 
 
 export const validReportFilter = [
+  check("page")
+  .trim()
+  .notEmpty()
+  .withMessage('No debe estar vacío')
+  .isNumeric()
+  .withMessage('debe ser un number'),
+
   check("field")
   .trim()
   .notEmpty()
@@ -391,13 +398,6 @@ export const validReportFilter = [
   .isString()
   .withMessage('debe ser un string'),
 
-  check("page")
-  .trim()
-  .notEmpty()
-  .withMessage('No debe estar vacío')
-  .isNumeric()
-  .withMessage('debe ser un number'),
-  
   check("fieldValue")
     .trim()
     .notEmpty()
@@ -406,7 +406,7 @@ export const validReportFilter = [
     .withMessage('debe ser un string'),
 
   // Validador para 'dateStart'
-  check('dateStart')
+  check('startDate')
     .trim()
     .notEmpty()
     .withMessage('No debe estar vacío')
@@ -424,9 +424,8 @@ export const validReportFilter = [
 
       // Verificar si la fecha es válida
       const isValidDate = (d:string, m:string, y:string) => {
-        const date = new Date(`${y}-${m}-${d}`+'T00:00:00Z');
-
-        return date.getUTCDate() === parseInt(d) && (date.getMonth() + 1) === parseInt(m) && date.getFullYear() === parseInt(y);
+        const date = new Date(`${y}-${m}-${d}`);
+        return date.getUTCDate() === parseInt(d) && (date.getUTCMonth() + 1) === parseInt(m) && date.getFullYear() === parseInt(y);
       };
       if (!isValidDate(day, month, year)) {
         throw new Error('Fecha no válida');
@@ -435,8 +434,8 @@ export const validReportFilter = [
       return true;
     }),
 
-// Validador para 'dateEnd'
-  check('dateEnd')
+  // Validador para 'dateEnd'
+  check('endDate')
     .trim()
     .notEmpty()
     .withMessage('No debe estar vacío')
@@ -454,7 +453,7 @@ export const validReportFilter = [
 
       // Verificar si la fecha es válida
       const isValidDate = (d:string, m:string, y:string) => {
-        const date = new Date(`${y}-${m}-${d}`+'T00:00:00Z');
+        const date = new Date(`${y}-${m}-${d}`);
 
         return date.getUTCDate() === parseInt(d) && (date.getMonth() + 1) === parseInt(m) && date.getFullYear() === parseInt(y);
       };

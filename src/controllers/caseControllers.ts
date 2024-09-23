@@ -699,8 +699,8 @@ export const especificReport = async ( req:Request, res:Response ) =>{
     const { 
       field,
       fieldValue,
-      dateStart,
-      dateEnd,
+      startDate,
+      endDate,
       page,
       userId,
     } = matchedData(req);
@@ -709,8 +709,8 @@ export const especificReport = async ( req:Request, res:Response ) =>{
     //if user dont exist return error
     if(!userExist) return handleError(res,404,"Usuario inexistente");
 
-    const mongoStartDate = tomongoDate(dateStart);
-    const mongoEndDate = tomongoDate(dateEnd);
+    const mongoStartDate = tomongoDate(startDate);
+    const mongoEndDate = tomongoDate(endDate);
 
     const myCustomLabels = {
       totalDocs: 'totalDocs',
@@ -739,10 +739,10 @@ export const especificReport = async ( req:Request, res:Response ) =>{
 
 
     if (field && fieldValue) {
-      query[field] = fieldValue;  // Añadimos el filtro dinámico
+      query[field] = { $regex: new RegExp(fieldValue, 'i') };   // Añadimos el filtro dinámico
     }
 
-    if (dateStart && dateEnd) {
+    if (startDate && endDate) {
       query.$expr = {
         $and: [
           {
