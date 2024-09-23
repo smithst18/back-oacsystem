@@ -10,6 +10,7 @@ import {
   validCasesubId,
   validOptionalCase,
   validCaseSearch,
+  validReportFilter,
 } from "../validations/caseValidations";
 import { validUserId } from "../validations/userValidations";
 import { uploadFile, multerErrorHandler } from "../middlewares/multer";
@@ -31,5 +32,6 @@ router.get('/generalStaticsPerMonth',caseControllers.generalStaticsPerMonth);
 router.get('/getCasesInExcel',caseControllers.generateExcel);
 router.get('/generateExcelOneCase/:caseSubId',validCasesubId,caseControllers.generateExcelOneCase);
 router.get('/generateExcelClosedCase/:caseSubId',validCasesubId,caseControllers.generateExcelClosedCase);
+router.get('/especificReport/:userId/:page/:field/:fieldValue/:dateStart/:dateEnd',validUserId,validReportFilter,caseControllers.especificReport);
 
 export default router;

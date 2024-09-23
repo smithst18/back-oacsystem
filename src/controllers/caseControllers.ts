@@ -10,6 +10,8 @@ import PizZip from "pizzip";
 import docxtemplater from "docxtemplater";
 import { SubCategoryI } from "../interfaces/Subcategory";
 import { camelize } from "../utils/handleCamelcase";
+import { tomongoDate } from "../utils/handleDate";
+
 const pathStorage = `${__dirname}/../public/files`;
 const PUBLIC_URL = process.env.PUBLIC_URL || "http://localhost:3000/public";
 
@@ -685,4 +687,96 @@ export const generateExcelClosedCase = async (req: Request, res: Response) => {
     res.status(500).send({ msg: 'Server error', error });
   }
 };
+
+
+/**
+ * GET expecific cases by maked query
+ * @param {*} req 
+ * @param {*} res 
+ */
+export const especificReport = async ( req:Request, res:Response ) =>{
+  try{
+    const { 
+      field,
+      fieldValue,
+      dateStart,
+      dateEnd,
+      page,
+      userId,
+    } = matchedData(req);
+
+    const userExist = await userModel.findById(userId);
+    //if user dont exist return error
+    if(!userExist) return handleError(res,404,"Usuario inexistente");
+
+    const mongoStartDate = tomongoDate(dateStart);
+    const mongoEndDate = tomongoDate(dateEnd);
+
+    const myCustomLabels = {
+      totalDocs: 'totalDocs',
+      docs: 'cases',
+      limit: 'perPage',
+      page: 'currentPage',
+      nextPage: 'next',
+      prevPage: 'prev',
+      totalPages: 'totalPages',
+      pagingCounter: 'pagingCounter',
+      meta: 'paginator',
+    };
+
+    const options = {
+      page: parseInt(page),
+      limit: 10,
+      customLabels: myCustomLabels,
+      select:["_id","remitente","prioridad","status","cedulaBeneficiario","analistaId","subId"],
+      populate:[{
+        path: 'analistaId',
+        select:["name","_id"]
+      }]
+    };
+
+    let query : any = {};
+
+
+    if (field && fieldValue) {
+      query[field] = fieldValue;  // Añadimos el filtro dinámico
+    }
+
+    if (dateStart && dateEnd) {
+      query.$expr = {
+        $and: [
+          {
+            $gte: [
+              { $dateFromParts: { year: { $year: "$createdAt" }, month: { $month: "$createdAt" }, day: { $dayOfMonth: "$createdAt" } } },
+              { $dateFromParts: { year: mongoStartDate.getUTCFullYear(), month: mongoStartDate.getUTCMonth() + 1, day: mongoStartDate.getUTCDate() } }
+            ]
+          },
+          {
+            $lte: [
+              { $dateFromParts: { year: { $year: "$createdAt" }, month: { $month: "$createdAt" }, day: { $dayOfMonth: "$createdAt" } } },
+              { $dateFromParts: { year: mongoEndDate.getUTCFullYear(), month: mongoEndDate.getUTCMonth() + 1, day: mongoEndDate.getUTCDate() } }
+            ]
+          }
+        ]
+      };
+    }
+    
+    const paginatedData =  await caseModel.paginate(query, options, (err:any, result:any) => {
+      if (err) {
+
+        return console.log("Error paginando los Datos",err);
+
+      }else return result
+    });
+
+    if(paginatedData && paginatedData.cases && Array.isArray(paginatedData.cases) && paginatedData.cases.length > 0 ) {
+
+      return res.status(200).send({ paginatedData });
+    
+    }else return handleError(res,404,"No se ha encontrado casos");
+
+  }catch(error){
+    return res.status(500).send({ msg:'Server error',error });
+  }
+}
 

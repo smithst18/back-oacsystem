@@ -382,3 +382,89 @@ export const validCaseSearch = [
   
 ];
 
+
+export const validReportFilter = [
+  check("field")
+  .trim()
+  .notEmpty()
+  .withMessage('No debe estar vacío')
+  .isString()
+  .withMessage('debe ser un string'),
+
+  check("page")
+  .trim()
+  .notEmpty()
+  .withMessage('No debe estar vacío')
+  .isNumeric()
+  .withMessage('debe ser un number'),
+  
+  check("fieldValue")
+    .trim()
+    .notEmpty()
+    .withMessage('No debe estar vacío')
+    .isString()
+    .withMessage('debe ser un string'),
+
+  // Validador para 'dateStart'
+  check('dateStart')
+    .trim()
+    .notEmpty()
+    .withMessage('No debe estar vacío')
+    .custom((value) => {
+      // Decodificar la fecha codificada (si viene como %2F)
+      const decodedValue = decodeURIComponent(value);
+      // Validar el formato de fecha dd/mm/yyyy
+      const regex = /^\d{2}\/\d{2}\/\d{4}$/;
+
+      if (!regex.test(decodedValue)) {
+        throw new Error('Debe tener el formato dd/mm/yyyy');
+      }
+
+      const [day, month, year] = value.split('/');
+
+      // Verificar si la fecha es válida
+      const isValidDate = (d:string, m:string, y:string) => {
+        const date = new Date(`${y}-${m}-${d}`+'T00:00:00Z');
+
+        return date.getUTCDate() === parseInt(d) && (date.getMonth() + 1) === parseInt(m) && date.getFullYear() === parseInt(y);
+      };
+      if (!isValidDate(day, month, year)) {
+        throw new Error('Fecha no válida');
+      }
+
+      return true;
+    }),
+
+// Validador para 'dateEnd'
+  check('dateEnd')
+    .trim()
+    .notEmpty()
+    .withMessage('No debe estar vacío')
+    .custom((value) => {
+      // Decodificar la fecha codificada (si viene como %2F)
+      const decodedValue = decodeURIComponent(value);
+      // Validar el formato de fecha dd/mm/yyyy
+      const regex = /^\d{2}\/\d{2}\/\d{4}$/;
+
+      if (!regex.test(decodedValue)) {
+        throw new Error('Debe tener el formato dd/mm/yyyy');
+      }
+
+      const [day, month, year] = value.split('/');
+
+      // Verificar si la fecha es válida
+      const isValidDate = (d:string, m:string, y:string) => {
+        const date = new Date(`${y}-${m}-${d}`+'T00:00:00Z');
+
+        return date.getUTCDate() === parseInt(d) && (date.getMonth() + 1) === parseInt(m) && date.getFullYear() === parseInt(y);
+      };
+      if (!isValidDate(day, month, year)) {
+        throw new Error('Fecha no válida');
+      }
+
+      return true;
+    }),
+  (req:Request, res:Response, next:NextFunction) => validateResult(req, res, next),
+  
+];
+

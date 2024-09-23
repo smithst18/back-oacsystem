@@ -162,3 +162,8 @@ content-type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
 ### generate excel
 GET http://localhost:3002/api/cases/generateExcelOneCase/1 HTTP/1.1
 content-type: application/vnd.openxmlformats-officedocument.wordprocessingml.document
+
+
+### generate excel
+GET http://localhost:3002/api/cases/especificReport/66bd5a358091bbada5131b7b/1/categoria/salud/12%2F08%2F2024/14%2F08%2F2024 HTTP/1.1
+content-type: application/json
