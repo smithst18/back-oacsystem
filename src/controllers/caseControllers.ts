@@ -85,7 +85,6 @@ export const getCases = async ( req:Request, res:Response ) =>{
     
     if(search && search != undefined && search != "undefined" && search != null ) {
       //setemaos la pagina de busqueda en 0 para que no haya errores en la respuesta cuando tengamos un query de busqueda
-      options.page = 0;
       query = {
 
         $or: [
@@ -705,6 +704,12 @@ export const especificReport = async ( req:Request, res:Response ) =>{
       userId,
     } = matchedData(req);
 
+    console.log(field,
+      fieldValue,
+      startDate,
+      endDate,
+      page)
+
     const userExist = await userModel.findById(userId);
     //if user dont exist return error
     if(!userExist) return handleError(res,404,"Usuario inexistente");
@@ -735,29 +740,26 @@ export const especificReport = async ( req:Request, res:Response ) =>{
       }]
     };
 
-    let query : any = {};
+    let query: any = {};
 
+    // numeric field list
+    const numericFields = ['edad', 'otroCampoNumerico'];
 
     if (field && fieldValue) {
-      query[field] = { $regex: new RegExp(fieldValue, 'i') };   // Añadimos el filtro dinámico
+      // if the field is numeric
+      if (numericFields.includes(field)) {
+        query[field] = Number(fieldValue);  // comparation if is numeric
+      } else {
+        // use regex if is a string
+        query[field] = { $regex: new RegExp(fieldValue, 'i') };
+      }
     }
 
+    // filter dates
     if (startDate && endDate) {
-      query.$expr = {
-        $and: [
-          {
-            $gte: [
-              { $dateFromParts: { year: { $year: "$createdAt" }, month: { $month: "$createdAt" }, day: { $dayOfMonth: "$createdAt" } } },
-              { $dateFromParts: { year: mongoStartDate.getUTCFullYear(), month: mongoStartDate.getUTCMonth() + 1, day: mongoStartDate.getUTCDate() } }
-            ]
-          },
-          {
-            $lte: [
-              { $dateFromParts: { year: { $year: "$createdAt" }, month: { $month: "$createdAt" }, day: { $dayOfMonth: "$createdAt" } } },
-              { $dateFromParts: { year: mongoEndDate.getUTCFullYear(), month: mongoEndDate.getUTCMonth() + 1, day: mongoEndDate.getUTCDate() } }
-            ]
-          }
-        ]
+      query.createdAt = {
+        $gte: mongoStartDate,
+        $lte: mongoEndDate
       };
     }
     
