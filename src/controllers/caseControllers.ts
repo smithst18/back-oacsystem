@@ -57,7 +57,7 @@ export const save = async ( req:Request, res:Response ) =>{
 export const getCases = async ( req:Request, res:Response ) =>{
   try{
     const { page , search, userId } = matchedData(req);
-    
+    console.log(search)
     const myCustomLabels = {
       totalDocs: 'totalDocs',
       docs: 'cases',
@@ -83,25 +83,35 @@ export const getCases = async ( req:Request, res:Response ) =>{
 
     let query = {};
     
-    if(search && search != undefined && search != "undefined" && search != null ) {
-      //setemaos la pagina de busqueda en 0 para que no haya errores en la respuesta cuando tengamos un query de busqueda
+
+    if (search && search !== undefined && search !== "undefined" && search !== null) {
+      // Expresión regular para buscar con o sin el prefijo "V-"
+      const regexSearch = new RegExp(`^V?-?${search.replace(/^V-?/i, "")}`, "i");
+    
+      // Chequear si la búsqueda es un número
+      const isNumeric = !isNaN(search);
+    
+      // Construir el query
       query = {
-
         $or: [
-          //...(ObjectId.isValid(search) ? [{ _id: search }] : []),  operador ternario donde se valida si la cadena es un object id valido en caso de cerlo se busca por la id
-          { subId:search},
-          { remitente: { $regex: new RegExp(`^${search}`, "i") } },
-          { nombreSolicitante: { $regex: new RegExp(`^${search}`, "i") } },
-          { cedulaSolicitante: { $regex: new RegExp(`^${search}`, "i") } },
-          { nombreBeneficiario: { $regex: new RegExp(`^${search}`, "i") } },
-          { cedulaBeneficiario: { $regex: new RegExp(`^${search}`, "i") } },
-          { estado: { $regex: new RegExp(`^${search}`, "i") } },
-          { tipoBeneficiario: { $regex: new RegExp(`^${search}`, "i") } },
+          // Solo incluir el campo `subId` si la búsqueda es numérica
+          ...(isNumeric ? [{ subId: search }] : []),
+          { remitente: { $regex: new RegExp(`^${search}`, "i") } }, // Búsqueda en remitente
+          { nombreSolicitante: { $regex: new RegExp(`^${search}`, "i") } }, // Búsqueda en nombreSolicitante
+          { cedulaSolicitante: { $regex: regexSearch } }, // Búsqueda flexible en cedulaSolicitante
+          { nombreBeneficiario: { $regex: new RegExp(`^${search}`, "i") } }, // Búsqueda en nombreBeneficiario
+          { cedulaBeneficiario: { $regex: regexSearch } }, // Búsqueda flexible en cedulaBeneficiario
+          { estado: { $regex: new RegExp(`${search}`, "i") } }, // Búsqueda flexible dentro del campo estado
+          { tipoBeneficiario: { $regex: new RegExp(`^${search}`, "i") } }, // Búsqueda en tipoBeneficiario
         ],
-
-      }
+      };
+    
+      // Reseteamos la página de búsqueda en caso de que sea necesario
     }
-
+    
+    
+    
+    
     // verificar si el usuario que esta solicitando la data existe y tiene los permisos pertinentes es decir es admin o user normal
 
     const userExist = await userModel.findById(userId);
