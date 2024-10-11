@@ -57,7 +57,7 @@ export const save = async ( req:Request, res:Response ) =>{
 export const getCases = async ( req:Request, res:Response ) =>{
   try{
     const { page , search, userId } = matchedData(req);
-    console.log(search)
+
     const myCustomLabels = {
       totalDocs: 'totalDocs',
       docs: 'cases',
