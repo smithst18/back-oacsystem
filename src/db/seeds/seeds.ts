@@ -128,6 +128,11 @@ mongoose.connect(
             name: "ayuda tecnica",
             subcategoriaId:"66885e41128f5eb2ede6d8a5"
           }, 
+          {
+             _id: "68885e41128f5eb2ede6d8a1", 
+            name: "consulta medica",
+            subcategoriaId:"66885e41128f5eb2ede6d8a5"
+          }, 
            //   vivienda y habitat
           {
             _id: "59885e41128f5eb2ede6d8a6", 

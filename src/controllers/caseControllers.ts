@@ -38,6 +38,8 @@ export const save = async ( req:Request, res:Response ) =>{
       }
     }
     
+    const foundCase = await caseModel.findOne({ subId:cleanBody.subId });
+    if(foundCase) return handleError(res,400,`El caso Id ${cleanBody.subId} ya ha sido creado`);
     const savedCase = await caseModel.create(cleanBody);
 
     if(savedCase)return res.status(200).send({msg:"user Created",savedCase});
@@ -74,11 +76,13 @@ export const getCases = async ( req:Request, res:Response ) =>{
       page: parseInt(page),
       limit: 10,
       customLabels: myCustomLabels,
-      select:["_id","remitente","prioridad","status","cedulaBeneficiario","analistaId","subId"],
-      populate:[{
-        path: 'analistaId',
-        select:["name","_id"]
-      }]
+      select:["_id","subId","cedulaBeneficiario","status","estado","categoria"],
+    //   populate:[
+    //     {
+    //       path: 'analistaId',
+    //       select:["name","_id"]
+    //     },
+    // ]
     };
 
     let query = {};
@@ -100,6 +104,7 @@ export const getCases = async ( req:Request, res:Response ) =>{
           { nombreSolicitante: { $regex: new RegExp(`^${search}`, "i") } }, // Búsqueda en nombreSolicitante
           { cedulaSolicitante: { $regex: regexSearch } }, // Búsqueda flexible en cedulaSolicitante
           { nombreBeneficiario: { $regex: new RegExp(`^${search}`, "i") } }, // Búsqueda en nombreBeneficiario
+          { status: { $regex: new RegExp(`^${search}`, "i") } }, // Búsqueda en nombreBeneficiario
           { cedulaBeneficiario: { $regex: regexSearch } }, // Búsqueda flexible en cedulaBeneficiario
           { estado: { $regex: new RegExp(`${search}`, "i") } }, // Búsqueda flexible dentro del campo estado
           { tipoBeneficiario: { $regex: new RegExp(`^${search}`, "i") } }, // Búsqueda en tipoBeneficiario
@@ -181,22 +186,49 @@ export const getcaseById = async ( req:Request, res:Response ) =>{
 export const updateCase = async ( req:Request, res:Response ) =>{
   try{
     const cleanBody = matchedData(req);
+
     const { userId, caseSubId } = matchedData(req);
-  
+
+    const file = req.body.fileName;
+
+    if (file) {
+      const filePath = `${pathStorage}/${file}`;
+      cleanBody.file = `${PUBLIC_URL}/${file}`;
+      // Verifica si el archivo realmente existe antes de guardar la ruta en la base de datos.
+      if (!fs.existsSync(filePath)) {
+        return handleError(res, 403, 'Error al registrar, archivo no encontrado');
+      }
+    }
+
     const user = await userModel.findById(userId);
 
     // buscamos que el usuario exista si no existe return error
     if(!user) return handleError(res,404,"No se ha encontrado El usuario");
 
-    // validamos el status del documento
+    // validamos que exista el documento
     const foundCase = await caseModel.findOne({subId:caseSubId});
     if(!foundCase) return handleError(res,404,"No existe el caso a actualizar");
 
-    // validamos el rol del usuario
+    //validamos el status del documento  validamos el rol del usuario
     if(foundCase.status === "cerrado" && user.rol !== "auditor"){
       return handleError(res,403,"No tienes los permisos para editar un caso cerrado");
     }
 
+    // Eliminar el archivo viejo en caso de tener un nuevo archivo
+    if(foundCase.file && file) {
+
+      const filePath = `${pathStorage}/${foundCase.file.split('/').pop()}`;
+
+      fs.unlink(filePath, (err) => {
+        if (err) {
+          console.error(`Error al eliminar el archivo: ${err.message}`);
+          return;
+        }
+        console.log('Archivo eliminado exitosamente');
+      });
+    }
+
+    //actualizamos el caso
     const updatedCase = await caseModel.findOneAndUpdate(
       { subId: caseSubId },
       cleanBody,
@@ -546,7 +578,7 @@ export const generateExcel = async ( req:Request, res:Response ) =>{
  * @param {*} res 
  */
 
-export const generateExcelOneCase = async (req: Request, res: Response) => {
+export const generateWordOneCase = async (req: Request, res: Response) => {
   try {
     const { caseSubId } = matchedData(req);
     let foundCase = await caseModel.findOne({ subId: caseSubId }).populate("tipoId subCategoriaId");
@@ -577,13 +609,9 @@ export const generateExcelOneCase = async (req: Request, res: Response) => {
       PARTICULAR: caseWithSubCategory.tipoBeneficiario === "particular" ? "☑" : "☐",
       INSTITUCIONAL: caseWithSubCategory.tipoBeneficiario === "institucional" ? "☑" : "☐",
       CONPPA: caseWithSubCategory.tipoBeneficiario === "conppa" ? "☑" : "☐",
-      PESCADOR_ACUICULTOR: caseWithSubCategory.tipoBeneficiario === "acuicultor" ? "☑" : "☐",
+      PESCADOR_ACUICULTOR: caseWithSubCategory.tipoBeneficiario === "acuicultor" || "pescador" ? "☑" : "☐",
       CATEGORIA: caseWithSubCategory.categoria,
       SUBCATEGORIA: caseWithSubCategory.subCategoriaId.name,
-      // SUGERENCIA: caseWithSubCategory.categoria === "sugerencia" ? "☑" : "☐",
-      // PETICION: caseWithSubCategory.categoria === "peticion" ? "☑" : "☐",
-      // DENUNCIA: caseWithSubCategory.categoria === "denuncia" ? "☑" : "☐",
-      // RECLAMO: caseWithSubCategory.categoria === "reclamo" ? "☑" : "☐",
       NOMBRE_OTRA: camelize(caseWithSubCategory.categoria === "quejas" ? "queja" : ""),
       DESCRIPCION: caseWithSubCategory.descripcion,
     });

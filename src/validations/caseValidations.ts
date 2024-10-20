@@ -3,6 +3,24 @@ import { validateResult } from '../utils/handleValidators';
 import { Response, Request, NextFunction } from "express";
 
 export const validCase = [
+  check("subId")
+    .exists()
+    .withMessage('debe existir')
+    .trim()
+    .notEmpty()
+    .withMessage('No debe estar vacío')
+    .isString()
+    .withMessage('debe ser un string'),
+
+  check("createdAt")
+    .exists()
+    .withMessage('debe existir')
+    .trim()
+    .notEmpty()
+    .withMessage('No debe estar vacío')
+    .isDate()
+    .withMessage('debe ser un string'),
+
   check("remitente")
     .exists()
     .withMessage('debe existir')
@@ -170,6 +188,21 @@ export const validCase = [
 
 export const validOptionalCase = [
   
+  check("subId")
+  .optional()
+  .notEmpty()
+  .withMessage('No debe estar vacío')
+  .isNumeric()
+  .withMessage('debe ser un numero'),
+
+  check("createdAt")
+  .optional()
+  .trim()
+  .notEmpty()
+  .withMessage('No debe estar vacío')
+  .isString()
+  .withMessage('debe ser un string'),
+
   check("viaResolucion")
   .optional()
   .trim()
