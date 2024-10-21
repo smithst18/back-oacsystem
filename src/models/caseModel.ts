@@ -136,7 +136,12 @@ const caseSchema  = new Schema<CaseI>({
   file:{
     type:String,
     trim:true,
-  }
+  },
+  OpeningDate: { 
+    type: Date,
+    required:true,
+    trim:true 
+  },
 },{
   timestamps:true,
   versionKey:false,

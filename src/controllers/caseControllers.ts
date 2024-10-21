@@ -183,43 +183,41 @@ export const getcaseById = async ( req:Request, res:Response ) =>{
  */
 
 
-export const updateCase = async ( req:Request, res:Response ) =>{
-  try{
-    const cleanBody = matchedData(req);
-
-    const { userId, caseSubId } = matchedData(req);
+export const updateCase = async (req: Request, res: Response) => {
+  try {
+    const cleanBody = matchedData(req); // Obtenemos los datos validados
+    const { userId, caseSubId } = cleanBody; // Extraemos userId y caseSubId validados
 
     const file = req.body.fileName;
 
+    // Si se ha enviado un archivo, verificamos su existencia
     if (file) {
       const filePath = `${pathStorage}/${file}`;
       cleanBody.file = `${PUBLIC_URL}/${file}`;
+
       // Verifica si el archivo realmente existe antes de guardar la ruta en la base de datos.
       if (!fs.existsSync(filePath)) {
         return handleError(res, 403, 'Error al registrar, archivo no encontrado');
       }
     }
 
+    // Buscamos al usuario por su ID
     const user = await userModel.findById(userId);
+    if (!user) return handleError(res, 404, 'No se ha encontrado el usuario');
 
-    // buscamos que el usuario exista si no existe return error
-    if(!user) return handleError(res,404,"No se ha encontrado El usuario");
+    // Buscamos el caso que se va a actualizar
+    const foundCase = await caseModel.findOne({ subId: caseSubId });
+    if (!foundCase) return handleError(res, 404, 'No existe el caso a actualizar');
 
-    // validamos que exista el documento
-    const foundCase = await caseModel.findOne({subId:caseSubId});
-    if(!foundCase) return handleError(res,404,"No existe el caso a actualizar");
-
-    //validamos el status del documento  validamos el rol del usuario
-    if(foundCase.status === "cerrado" && user.rol !== "auditor"){
-      return handleError(res,403,"No tienes los permisos para editar un caso cerrado");
+    // Validamos si el caso está cerrado y si el usuario tiene permisos para editarlo
+    if (foundCase.status === 'cerrado' && user.rol !== 'auditor') {
+      return handleError(res, 403, 'No tienes los permisos para editar un caso cerrado');
     }
 
-    // Eliminar el archivo viejo en caso de tener un nuevo archivo
-    if(foundCase.file && file) {
-
-      const filePath = `${pathStorage}/${foundCase.file.split('/').pop()}`;
-
-      fs.unlink(filePath, (err) => {
+    // Eliminar el archivo viejo si hay uno nuevo
+    if (foundCase.file && file) {
+      const oldFilePath = `${pathStorage}/${foundCase.file.split('/').pop()}`;
+      fs.unlink(oldFilePath, (err) => {
         if (err) {
           console.error(`Error al eliminar el archivo: ${err.message}`);
           return;
@@ -227,21 +225,29 @@ export const updateCase = async ( req:Request, res:Response ) =>{
         console.log('Archivo eliminado exitosamente');
       });
     }
-
-    //actualizamos el caso
+    console.log(cleanBody.createdAt)
+    // Actualizamos el caso, combinando la nueva fecha y los datos de cleanBody
     const updatedCase = await caseModel.findOneAndUpdate(
       { subId: caseSubId },
-      cleanBody,
+      { 
+        $set: { 
+          createdAt: new Date('08/12/2024'), // Actualización del campo createdAt
+          ...cleanBody // Incluimos los demás datos validados de cleanBody
+        } 
+      },
       { new: true } // Esta opción devuelve el documento actualizado
     ).populate("analistaId tipoId subCategoriaId");
 
-    if(!updatedCase) return handleError(res,403,"Error al Actualizar el caso");
-    else return res.status(200).send({updatedCase});
+    if (!updatedCase) {
+      return handleError(res, 403, 'Error al actualizar el caso');
+    } else {
+      return res.status(200).send({ updatedCase });
+    }
 
-  }catch(error){
-    return res.status(500).send({ msg:'Server error',error });
+  } catch (error) {
+    return res.status(500).send({ msg: 'Server error', error });
   }
-}
+};
 
 
 
