@@ -12,7 +12,7 @@ export const validCase = [
     .isString()
     .withMessage('debe ser un string'),
 
-  check("createdAt")
+  check("openingDate")
     .exists()
     .withMessage('debe existir')
     .trim()
@@ -195,7 +195,7 @@ export const validOptionalCase = [
   .isNumeric()
   .withMessage('debe ser un numero'),
 
-  check("createdAt")
+  check("openingDate")
   .optional()
   .trim()
   .notEmpty()
@@ -350,6 +350,14 @@ export const validOptionalCase = [
     .withMessage('debe ser mongoid'),
 
   check("prioridad")
+    .optional()
+    .trim()
+    .notEmpty()
+    .withMessage('No debe estar vacío')
+    .isString()
+    .withMessage('debe ser un string'),
+
+  check("descripcion")
     .optional()
     .trim()
     .notEmpty()

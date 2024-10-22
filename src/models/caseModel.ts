@@ -137,7 +137,7 @@ const caseSchema  = new Schema<CaseI>({
     type:String,
     trim:true,
   },
-  OpeningDate: { 
+  openingDate: { 
     type: Date,
     required:true,
     trim:true 

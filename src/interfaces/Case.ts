@@ -27,7 +27,7 @@ export interface CaseI extends Document {
     diario:[Schema.Types.ObjectId];
     descripcion:string;
     file:string;
-    OpeningDate:Date;
+    openingDate:Date;
     createdAt: Date;
     updatedAt: Date;
   }

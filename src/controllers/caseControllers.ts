@@ -225,15 +225,12 @@ export const updateCase = async (req: Request, res: Response) => {
         console.log('Archivo eliminado exitosamente');
       });
     }
-    console.log(cleanBody.createdAt)
+    console.log(cleanBody)
     // Actualizamos el caso, combinando la nueva fecha y los datos de cleanBody
     const updatedCase = await caseModel.findOneAndUpdate(
       { subId: caseSubId },
       { 
-        $set: { 
-          createdAt: new Date('08/12/2024'), // Actualización del campo createdAt
-          ...cleanBody // Incluimos los demás datos validados de cleanBody
-        } 
+        ...cleanBody // Incluimos los demás datos validados de cleanBody
       },
       { new: true } // Esta opción devuelve el documento actualizado
     ).populate("analistaId tipoId subCategoriaId");
