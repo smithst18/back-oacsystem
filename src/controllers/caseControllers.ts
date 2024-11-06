@@ -160,35 +160,20 @@ export const getCases = async ( req:Request, res:Response ) =>{
  */
 
 
-export const getcaseById = async (req: Request, res: Response) => {
-  try {
-    const { caseId } = matchedData(req);  // Desestructuramos subId y id del cuerpo de la solicitud
+export const getcaseById = async ( req:Request, res:Response ) =>{
+  try{
+    const { caseSubId } = matchedData(req);
+    if(caseSubId){
+      const foundCase = await caseModel.findOne({ subId:caseSubId }).populate("analistaId tipoId subCategoriaId");
+      if(foundCase) return res.status(200).send({ foundCase });
 
-    // Si se proporciona un id
-    if (caseId) {
-
-      const foundCase = await caseModel.findOne({ _id: caseId }).populate("analistaId tipoId subCategoriaId");
+      else return handleError(res,404,"case not found"); 
       
-      if (foundCase) return res.status(200).send({ foundCase });
-
-      else return handleError(res, 404, "Case not found");
-      
-    }
-
-    // Si no se proporciona ni subId ni id
-    return handleError(res, 400, "ID or subId is required");
-
-  } catch (error) {
-    // Comprobamos si el error es una instancia de Error
-    if (error instanceof Error) {
-      console.error("Error retrieving case:", error);
-      return res.status(500).send({ msg: "Server error", error: error.message });
-    }
-    // Si no es una instancia de Error, retornamos un mensaje genérico
-    console.error("Unknown error:", error);
-    return res.status(500).send({ msg: "Server error", error: "An unknown error occurred." });
+    }else return handleError(res,404,"ID necesario"); 
+  }catch(error){
+    return res.status(500).send({ msg:'Server error',error });
   }
-};
+}
 
 
 /**
@@ -198,43 +183,41 @@ export const getcaseById = async (req: Request, res: Response) => {
  */
 
 
-export const updateCase = async ( req:Request, res:Response ) =>{
-  try{
-    const cleanBody = matchedData(req);
-
-    const { userId, caseId } = matchedData(req);
+export const updateCase = async (req: Request, res: Response) => {
+  try {
+    const cleanBody = matchedData(req); // Obtenemos los datos validados
+    const { userId, caseSubId } = cleanBody; // Extraemos userId y caseSubId validados
 
     const file = req.body.fileName;
 
+    // Si se ha enviado un archivo, verificamos su existencia
     if (file) {
       const filePath = `${pathStorage}/${file}`;
       cleanBody.file = `${PUBLIC_URL}/${file}`;
+
       // Verifica si el archivo realmente existe antes de guardar la ruta en la base de datos.
       if (!fs.existsSync(filePath)) {
         return handleError(res, 403, 'Error al registrar, archivo no encontrado');
       }
     }
 
+    // Buscamos al usuario por su ID
     const user = await userModel.findById(userId);
+    if (!user) return handleError(res, 404, 'No se ha encontrado el usuario');
 
-    // buscamos que el usuario exista si no existe return error
-    if(!user) return handleError(res,404,"No se ha encontrado El usuario");
+    // Buscamos el caso que se va a actualizar
+    const foundCase = await caseModel.findOne({ subId: caseSubId });
+    if (!foundCase) return handleError(res, 404, 'No existe el caso a actualizar');
 
-    // validamos que exista el documento
-    const foundCase = await caseModel.findOne({_id:caseId});
-    if(!foundCase) return handleError(res,404,"No existe el caso a actualizar");
-
-    //validamos el status del documento  validamos el rol del usuario
-    if(foundCase.status === "cerrado" && user.rol !== "auditor"){
-      return handleError(res,403,"No tienes los permisos para editar un caso cerrado");
+    // Validamos si el caso está cerrado y si el usuario tiene permisos para editarlo
+    if (foundCase.status === 'cerrado' && user.rol !== 'auditor') {
+      return handleError(res, 403, 'No tienes los permisos para editar un caso cerrado');
     }
 
-    // Eliminar el archivo viejo en caso de tener un nuevo archivo
-    if(foundCase.file && file) {
-
-      const filePath = `${pathStorage}/${foundCase.file.split('/').pop()}`;
-
-      fs.unlink(filePath, (err) => {
+    // Eliminar el archivo viejo si hay uno nuevo
+    if (foundCase.file && file) {
+      const oldFilePath = `${pathStorage}/${foundCase.file.split('/').pop()}`;
+      fs.unlink(oldFilePath, (err) => {
         if (err) {
           console.error(`Error al eliminar el archivo: ${err.message}`);
           return;
@@ -242,21 +225,26 @@ export const updateCase = async ( req:Request, res:Response ) =>{
         console.log('Archivo eliminado exitosamente');
       });
     }
-
-    //actualizamos el caso
+    console.log(cleanBody)
+    // Actualizamos el caso, combinando la nueva fecha y los datos de cleanBody
     const updatedCase = await caseModel.findOneAndUpdate(
-      { _id: caseId },
-      cleanBody,
+      { subId: caseSubId },
+      { 
+        ...cleanBody // Incluimos los demás datos validados de cleanBody
+      },
       { new: true } // Esta opción devuelve el documento actualizado
     ).populate("analistaId tipoId subCategoriaId");
 
-    if(!updatedCase) return handleError(res,403,"Error al Actualizar el caso");
-    else return res.status(200).send({updatedCase});
+    if (!updatedCase) {
+      return handleError(res, 403, 'Error al actualizar el caso');
+    } else {
+      return res.status(200).send({ updatedCase });
+    }
 
-  }catch(error){
-    return res.status(500).send({ msg:'Server error',error });
+  } catch (error) {
+    return res.status(500).send({ msg: 'Server error', error });
   }
-}
+};
 
 
 
