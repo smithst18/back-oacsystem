@@ -136,6 +136,11 @@ const caseSchema  = new Schema<CaseI>({
   file:{
     type:String,
     trim:true,
+  },
+  fechaDeApertura:{
+    type:Date,
+    trim:true,
+    required:true
   }
 },{
   timestamps:true,

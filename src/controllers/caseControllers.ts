@@ -160,20 +160,35 @@ export const getCases = async ( req:Request, res:Response ) =>{
  */
 
 
-export const getcaseById = async ( req:Request, res:Response ) =>{
-  try{
-    const { caseSubId } = matchedData(req);
-    if(caseSubId){
-      const foundCase = await caseModel.findOne({ subId:caseSubId }).populate("analistaId tipoId subCategoriaId");
-      if(foundCase) return res.status(200).send({ foundCase });
+export const getcaseById = async (req: Request, res: Response) => {
+  try {
+    const { caseId } = matchedData(req);  // Desestructuramos subId y id del cuerpo de la solicitud
 
-      else return handleError(res,404,"case not found"); 
+    // Si se proporciona un id
+    if (caseId) {
+
+      const foundCase = await caseModel.findOne({ _id: caseId }).populate("analistaId tipoId subCategoriaId");
       
-    }else return handleError(res,404,"ID necesario"); 
-  }catch(error){
-    return res.status(500).send({ msg:'Server error',error });
+      if (foundCase) return res.status(200).send({ foundCase });
+
+      else return handleError(res, 404, "Case not found");
+      
+    }
+
+    // Si no se proporciona ni subId ni id
+    return handleError(res, 400, "ID or subId is required");
+
+  } catch (error) {
+    // Comprobamos si el error es una instancia de Error
+    if (error instanceof Error) {
+      console.error("Error retrieving case:", error);
+      return res.status(500).send({ msg: "Server error", error: error.message });
+    }
+    // Si no es una instancia de Error, retornamos un mensaje genérico
+    console.error("Unknown error:", error);
+    return res.status(500).send({ msg: "Server error", error: "An unknown error occurred." });
   }
-}
+};
 
 
 /**
@@ -187,7 +202,7 @@ export const updateCase = async ( req:Request, res:Response ) =>{
   try{
     const cleanBody = matchedData(req);
 
-    const { userId, caseSubId } = matchedData(req);
+    const { userId, caseId } = matchedData(req);
 
     const file = req.body.fileName;
 
@@ -206,7 +221,7 @@ export const updateCase = async ( req:Request, res:Response ) =>{
     if(!user) return handleError(res,404,"No se ha encontrado El usuario");
 
     // validamos que exista el documento
-    const foundCase = await caseModel.findOne({subId:caseSubId});
+    const foundCase = await caseModel.findOne({_id:caseId});
     if(!foundCase) return handleError(res,404,"No existe el caso a actualizar");
 
     //validamos el status del documento  validamos el rol del usuario
@@ -230,7 +245,7 @@ export const updateCase = async ( req:Request, res:Response ) =>{
 
     //actualizamos el caso
     const updatedCase = await caseModel.findOneAndUpdate(
-      { subId: caseSubId },
+      { _id: caseId },
       cleanBody,
       { new: true } // Esta opción devuelve el documento actualizado
     ).populate("analistaId tipoId subCategoriaId");

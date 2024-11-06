@@ -8,6 +8,7 @@ import { caseControllers } from "../controllers";
 import { 
   validCase,
   validCasesubId,
+  validCaseId,
   validOptionalCase,
   validCaseSearch,
   validReportFilter,
@@ -27,14 +28,14 @@ router.post(
 );
 
 router.get('/getcases/:page/:userId/:search?',validCaseSearch,caseControllers.getCases);
-router.get('/getcaseById/:caseSubId',validCasesubId,caseControllers.getcaseById);
+router.get('/getcaseById/:caseId',validCaseId,caseControllers.getcaseById);
 
 router.put(
   '/updateCaseById',
   uploadFile.single('updatedCasoPdf'), // MULTER
   multerErrorHandler, //MULTER ERROR HANDLER
   validUserId,
-  validCasesubId,
+  validCaseId,
   validOptionalCase,
   caseControllers.updateCase
 );
