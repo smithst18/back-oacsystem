@@ -1,4 +1,4 @@
-import { check } from "express-validator";
+import { check, body } from "express-validator";
 import { validateResult } from '../utils/handleValidators';
 import { Response, Request, NextFunction } from "express";
 
@@ -12,7 +12,11 @@ export const validCase = [
     .isString()
     .withMessage('debe ser un string'),
 
+<<<<<<< HEAD
+  check("fechaDeApertura")
+=======
   check("openingDate")
+>>>>>>> d6bd553ad6e1a02534507c8bb940509424f4ce54
     .exists()
     .withMessage('debe existir')
     .trim()
@@ -195,13 +199,17 @@ export const validOptionalCase = [
   .isNumeric()
   .withMessage('debe ser un numero'),
 
+<<<<<<< HEAD
+  check("fechaDeApertura")
+=======
   check("openingDate")
+>>>>>>> d6bd553ad6e1a02534507c8bb940509424f4ce54
   .optional()
   .trim()
   .notEmpty()
   .withMessage('No debe estar vacío')
-  .isString()
-  .withMessage('debe ser un string'),
+  .isDate()
+  .withMessage('debe ser una Date'),
 
   check("viaResolucion")
   .optional()
@@ -383,7 +391,7 @@ export const validCasesubId = [
 
 export const validCaseId = [
 
-  check("id")
+  check("caseId")
     .trim()
     .notEmpty()
     .withMessage('No debe estar vacío')
@@ -507,4 +515,3 @@ export const validReportFilter = [
   (req:Request, res:Response, next:NextFunction) => validateResult(req, res, next),
   
 ];
-

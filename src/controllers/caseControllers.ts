@@ -160,20 +160,35 @@ export const getCases = async ( req:Request, res:Response ) =>{
  */
 
 
-export const getcaseById = async ( req:Request, res:Response ) =>{
-  try{
-    const { caseSubId } = matchedData(req);
-    if(caseSubId){
-      const foundCase = await caseModel.findOne({ subId:caseSubId }).populate("analistaId tipoId subCategoriaId");
-      if(foundCase) return res.status(200).send({ foundCase });
+export const getcaseById = async (req: Request, res: Response) => {
+  try {
+    const { caseId } = matchedData(req);  // Desestructuramos subId y id del cuerpo de la solicitud
 
-      else return handleError(res,404,"case not found"); 
+    // Si se proporciona un id
+    if (caseId) {
+
+      const foundCase = await caseModel.findOne({ _id: caseId }).populate("analistaId tipoId subCategoriaId");
       
-    }else return handleError(res,404,"ID necesario"); 
-  }catch(error){
-    return res.status(500).send({ msg:'Server error',error });
+      if (foundCase) return res.status(200).send({ foundCase });
+
+      else return handleError(res, 404, "Case not found");
+      
+    }
+
+    // Si no se proporciona ni subId ni id
+    return handleError(res, 400, "ID or subId is required");
+
+  } catch (error) {
+    // Comprobamos si el error es una instancia de Error
+    if (error instanceof Error) {
+      console.error("Error retrieving case:", error);
+      return res.status(500).send({ msg: "Server error", error: error.message });
+    }
+    // Si no es una instancia de Error, retornamos un mensaje genérico
+    console.error("Unknown error:", error);
+    return res.status(500).send({ msg: "Server error", error: "An unknown error occurred." });
   }
-}
+};
 
 
 /**
@@ -183,10 +198,18 @@ export const getcaseById = async ( req:Request, res:Response ) =>{
  */
 
 
+<<<<<<< HEAD
+export const updateCase = async ( req:Request, res:Response ) =>{
+  try{
+    const cleanBody = matchedData(req);
+
+    const { userId, caseId } = matchedData(req);
+=======
 export const updateCase = async (req: Request, res: Response) => {
   try {
     const cleanBody = matchedData(req); // Obtenemos los datos validados
     const { userId, caseSubId } = cleanBody; // Extraemos userId y caseSubId validados
+>>>>>>> d6bd553ad6e1a02534507c8bb940509424f4ce54
 
     const file = req.body.fileName;
 
@@ -209,9 +232,19 @@ export const updateCase = async (req: Request, res: Response) => {
     const foundCase = await caseModel.findOne({ subId: caseSubId });
     if (!foundCase) return handleError(res, 404, 'No existe el caso a actualizar');
 
+<<<<<<< HEAD
+    // validamos que exista el documento
+    const foundCase = await caseModel.findOne({_id:caseId});
+    if(!foundCase) return handleError(res,404,"No existe el caso a actualizar");
+
+    //validamos el status del documento  validamos el rol del usuario
+    if(foundCase.status === "cerrado" && user.rol !== "auditor"){
+      return handleError(res,403,"No tienes los permisos para editar un caso cerrado");
+=======
     // Validamos si el caso está cerrado y si el usuario tiene permisos para editarlo
     if (foundCase.status === 'cerrado' && user.rol !== 'auditor') {
       return handleError(res, 403, 'No tienes los permisos para editar un caso cerrado');
+>>>>>>> d6bd553ad6e1a02534507c8bb940509424f4ce54
     }
 
     // Eliminar el archivo viejo si hay uno nuevo
@@ -228,10 +261,15 @@ export const updateCase = async (req: Request, res: Response) => {
     console.log(cleanBody)
     // Actualizamos el caso, combinando la nueva fecha y los datos de cleanBody
     const updatedCase = await caseModel.findOneAndUpdate(
+<<<<<<< HEAD
+      { _id: caseId },
+      cleanBody,
+=======
       { subId: caseSubId },
       { 
         ...cleanBody // Incluimos los demás datos validados de cleanBody
       },
+>>>>>>> d6bd553ad6e1a02534507c8bb940509424f4ce54
       { new: true } // Esta opción devuelve el documento actualizado
     ).populate("analistaId tipoId subCategoriaId");
 
