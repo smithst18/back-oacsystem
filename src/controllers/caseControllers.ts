@@ -595,8 +595,8 @@ export const generateExcel = async ( req:Request, res:Response ) =>{
 
 export const generateWordOneCase = async (req: Request, res: Response) => {
   try {
-    const { caseSubId } = matchedData(req);
-    let foundCase = await caseModel.findOne({ subId: caseSubId }).populate("tipoId subCategoriaId");
+    const { caseId } = matchedData(req);
+    let foundCase = await caseModel.findOne({ _id: caseId }).populate("tipoId subCategoriaId");
 
     if (!foundCase) return handleError(res, 404, "No hay Casos disponibles");
 
@@ -675,9 +675,9 @@ export const generateWordOneCase = async (req: Request, res: Response) => {
 export const generateExcelClosedCase = async (req: Request, res: Response) => {
   try {
 
-    const { caseSubId } = matchedData(req);
+    const { caseId } = matchedData(req);
 
-    let foundCase = await caseModel.findOne({ subId: caseSubId, status:'cerrado' });
+    let foundCase = await caseModel.findOne({ _id: caseId, status:'cerrado' });
 
     if (!foundCase) return handleError(res, 404, "No existe el caso cerrado disponibles");
 
@@ -757,11 +757,11 @@ export const especificReport = async ( req:Request, res:Response ) =>{
       userId,
     } = matchedData(req);
 
-    console.log(field,
-      fieldValue,
-      startDate,
-      endDate,
-      page)
+    // console.log(field,
+    //   fieldValue,
+    //   startDate,
+    //   endDate,
+    //   page)
 
     const userExist = await userModel.findById(userId);
     //if user dont exist return error
