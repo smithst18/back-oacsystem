@@ -786,7 +786,7 @@ export const especificReport = async ( req:Request, res:Response ) =>{
       page: parseInt(page),
       limit: 10,
       customLabels: myCustomLabels,
-      select:["_id","remitente","prioridad","status","cedulaBeneficiario","analistaId","subId"],
+      select:["_id","subId","cedulaBeneficiario","status","estado","categoria"],
       populate:[{
         path: 'analistaId',
         select:["name","_id"]
