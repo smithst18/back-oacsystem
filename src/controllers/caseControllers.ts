@@ -85,8 +85,15 @@ export const getCases = async ( req:Request, res:Response ) =>{
     // ]
     };
 
-    let query = {};
-    
+    let query:any = {};
+
+     // Obtén el primer día del año actual para devolver campos del ano actual solamente
+     const currentYear = new Date().getFullYear();
+     const startOfYear = new Date(currentYear, 0, 1); // 1 de enero del año actual
+     const endOfYear = new Date(currentYear + 1, 0, 1); // 1 de enero del siguiente año
+ 
+     // Agrega el filtro de fecha al query
+     query.createdAt = { $gte: startOfYear, $lt: endOfYear };
 
     if (search && search !== undefined && search !== "undefined" && search !== null) {
       // Expresión regular para buscar con o sin el prefijo "V-"
