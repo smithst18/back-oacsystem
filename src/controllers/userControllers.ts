@@ -59,14 +59,14 @@ export const login = async ( req:Request, res:Response ) =>{
 export const signUp = async ( req:Request, res:Response ) =>{
   try{
     const cleanBody = matchedData(req);
-
+    console.log(cleanBody);
     //if the user already exist we go throe error 
     const userExist = await userModel.findOne({ci:cleanBody.ci}).select("ci _id name")
 
     if(userExist) return handleError(res,403,"usuario ya registrado");
-    //else we save the user preveiusly validated
+    
     const savedUser = await userModel.create(cleanBody);
-    //if user created return the user
+    
     if(savedUser)return res.status(200).send({msg:"user Created",savedUser});
 
     else return handleError(res,403,"Error al registrar"); 
@@ -86,6 +86,7 @@ export const getUsers = async ( req:Request, res:Response ) =>{
   try{
     //const cleanBody = matchedData(req);
     const pageSelected = req.params.page;
+
     const myCustomLabels = {
       totalDocs: 'totalDocs',
       docs: 'users',
@@ -97,11 +98,13 @@ export const getUsers = async ( req:Request, res:Response ) =>{
       pagingCounter: 'pagingCounter',
       meta: 'paginator',
     };
+
     const options = {
       page: parseInt(pageSelected),
-      limit: 10,
+      limit: 30,
       customLabels: myCustomLabels,
     }
+
     const paginatedData =  await userModel.paginate({ deleated: false }, options, (err:any, result:any) => {
       if (err) {
         
@@ -135,7 +138,7 @@ export const update = async ( req:Request, res:Response ) =>{
       _id: { $ne: cleanBody._id }
     });
 
-    if(existAllready) return handleError(res,403,"Usuario ya registrado");
+    if(existAllready) return handleError(res,403,"Usuario registrado previamente");
     else{
       const updatedUser = await userModel.findByIdAndUpdate(cleanBody._id,cleanBody,{ runValidators:true, new:true });
       if(updatedUser) return res.status(200).send({updatedUser}); 

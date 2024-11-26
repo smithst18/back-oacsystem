@@ -72,6 +72,12 @@ export const validSignup = [
       .isString()
       .withMessage('debe ser un string')
       .default('NA'),
+  check("state")
+      .exists()
+      .withMessage('Estado es un campo obligatorio')
+      .trim()
+      .isString()
+      .withMessage('debe ser un string'),
   (req:Request, res:Response, next:NextFunction) => validateResult(req, res, next),
   
 ];
@@ -109,6 +115,11 @@ export const validUpdate = [
       .isString()
       .withMessage('debe ser un string'),
   check("phoneNumber")
+      .optional()
+      .trim()
+      .isString()
+      .withMessage('debe ser un string'),
+  check("state")
       .optional()
       .trim()
       .isString()

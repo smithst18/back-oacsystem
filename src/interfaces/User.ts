@@ -7,6 +7,7 @@ export interface UserI extends Document {
     ci:string;
     birdDate:string;
     phoneNumber:string;
+    state:string;
     deleated:boolean;
     createdAt: Date;
     updatedAt: Date;

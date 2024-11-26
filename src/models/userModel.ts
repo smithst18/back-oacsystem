@@ -32,6 +32,11 @@ const userSchema  = new Schema<UserI>({
     trim:true,
     default: 'NA'
   },
+  state:{
+    type:String,
+    trim:true,
+    default: 'NA'
+  },
   deleated:{
     type:Boolean,
     trim:true,

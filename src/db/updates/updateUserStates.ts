@@ -1,10 +1,6 @@
 import 'dotenv/config';
 import mongoose from "mongoose";
-// import { encrypt } from "../../helpers/handlePassword";
-import {
-  caseModel
-  
-  } from "../../models";
+import { userModel } from "../../models";
 
 
 
@@ -17,12 +13,11 @@ mongoose.connect(
 ).then(async (mongoose) =>{
 
     console.log('Db connected to ',mongoose.connection.name);
-    await mongoose.connection.collection('cases').dropIndex('subId_1');
-    const updated = await caseModel.updateMany(
+    // await mongoose.connection.collection('users');
+    const updated = await userModel.updateMany(
         {},
         { 
-            status: "contacto inicial",
-            subId:null
+            state:"Distrito Capital"
         });
 
         if(updated) console.log("change done succesfully");
