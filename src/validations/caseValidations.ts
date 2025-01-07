@@ -3,14 +3,6 @@ import { validateResult } from '../utils/handleValidators';
 import { Response, Request, NextFunction } from "express";
 
 export const validCase = [
-  check("subId")
-    .exists()
-    .withMessage('debe existir')
-    .trim()
-    .notEmpty()
-    .withMessage('No debe estar vacío')
-    .isString()
-    .withMessage('debe ser un string'),
 
   check("fechaDeApertura")
     .exists()

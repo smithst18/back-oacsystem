@@ -38,8 +38,10 @@ export const save = async ( req:Request, res:Response ) =>{
       }
     }
     
-    const foundCase = await caseModel.findOne({ subId:cleanBody.subId });
-    if(foundCase) return handleError(res,400,`El caso Id ${cleanBody.subId} ya ha sido creado`);
+    //const foundCase = await caseModel.findOne({ subId:cleanBody.subId });
+
+    //if(foundCase) return handleError(res,400,`El caso Id ${cleanBody.subId} ya ha sido creado`);
+
     const savedCase = await caseModel.create(cleanBody);
 
     if(savedCase)return res.status(200).send({msg:"user Created",savedCase});
@@ -277,15 +279,17 @@ export const generalStaticsPerMonth = async ( req:Request, res:Response ) =>{
   try{
 
     const currentYear = new Date().getFullYear();
+    const startOfYear = new Date(currentYear, 0, 1); // 1 de enero del año actual
+    const endOfYear = new Date(currentYear + 1, 0, 1); // 1 de enero del siguiente año
 
+    const mathQuery : any = {
+      createdAt: {
+        $gte: startOfYear,
+        $lt: endOfYear
+      }
+    }
     const getCasesPerMonth = async (status?:string) => {
       //SEPARAMOS EL QUERY
-      const mathQuery : any = {
-        createdAt: {
-          $gte: new Date(currentYear, 0, 1), // Filtrar desde el primer día del año actual
-          $lt: new Date(currentYear + 1, 0, 1) // Filtrar hasta el primer día del siguiente año
-        }
-      }
       //SI EL STATUS EXISTE LO ANADIMOS AL OBJETO
       if(status) mathQuery.status = status;
 
@@ -345,6 +349,9 @@ export const generalStaticsPerMonth = async ( req:Request, res:Response ) =>{
     const onprocessCasesPerMonth = await getCasesPerMonth("en proceso");
 
     let quantityPerCategory = await caseModel.aggregate([
+      {
+        $match: mathQuery
+      },
       {
         $group: {
           _id: "$categoria", // Agrupa por el campo "category"

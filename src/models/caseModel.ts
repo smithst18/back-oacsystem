@@ -8,11 +8,23 @@ const caseSchema  = new Schema<CaseI>({
     type:Number,
     unique:true,
     trim:true,
-    required:true
   },
   remitente:{
     type:String,
-    enum: ["O.A.C","ministro","viceministerios","sala situacional","entes adscritos","gabinete ministerial","abordaje territorial","venapp","institucion"],
+    enum: [
+      "O.A.C","ministro",
+      "viceministerios",
+      "sala situacional",
+      "gabinete ministerial",
+      "abordaje territorial",
+      "venapp","institucion",
+      "corpesca",
+      "insopesca",
+      "pescalba",
+      "cenipa",
+      "fonpesca",
+      "conppa"
+    ],
     required:true,
     trim:true,
   },
@@ -111,7 +123,7 @@ const caseSchema  = new Schema<CaseI>({
   viaResolucion:{
     type:String,
     trim:true,
-    enum:["administrativa","servicio desconcentrado fondo negro primero","remitido","recursos propios","no procede","en espera"],
+    enum:["administrativa","servicio desconcentrado fondo negro primero","remitido","recursos propios","no procede","donacion","partida de donacion a tercero","en espera"],
     default:"en espera"
   },
   enteRedireccionado:{
@@ -149,26 +161,26 @@ const caseSchema  = new Schema<CaseI>({
 
 
 // Middleware para incrementar el subId
-// caseSchema.pre('save', async function (next) {
-//   const doc = this as CaseI;
+caseSchema.pre('save', async function (next) {
+  const doc = this as CaseI;
   
-//   if (doc.isNew) {
-//     try {
-//       const counter = await counterModel.findOneAndUpdate(
-//         { name: 'case_subId' },
-//         { $inc: { seq: 1 } },
-//         { new: true, upsert: true }
-//       );
+  if (doc.isNew) {
+    try {
+      const counter = await counterModel.findOneAndUpdate(
+        { name: 'case_subId' },
+        { $inc: { seq: 1 } },
+        { new: true, upsert: true }
+      );
 
-//       doc.subId = counter.seq;
-//       next();
-//     } catch (error) {
-//       next(error as mongoose.CallbackError);
-//     }
-//   } else {
-//     next();
-//   }
-// });
+      doc.subId = counter.seq;
+      next();
+    } catch (error) {
+      next(error as mongoose.CallbackError);
+    }
+  } else {
+    next();
+  }
+});
 
 
 caseSchema.plugin(paginate);

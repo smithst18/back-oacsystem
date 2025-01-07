@@ -7,7 +7,6 @@ import { caseControllers } from "../controllers";
 //validations middlewares
 import { 
   validCase,
-  validCasesubId,
   validCaseId,
   validOptionalCase,
   validCaseSearch,

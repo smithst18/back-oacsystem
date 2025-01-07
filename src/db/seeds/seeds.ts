@@ -20,16 +20,16 @@ mongoose.connect(
 
     Promise.all([
       
-        await userModel.insertMany([
-          {
-            name: "Emanuel Abreu",
-            password: "Emanuel12309/?",
-            rol: "admin",
-            ci: "27571718",
-            birdDate: "1998-10-18",
-            phoneNumber: "04126022414",
-          },
-        ]),
+        // await userModel.insertMany([
+        //   {
+        //     name: "Emanuel Abreu",
+        //     password: "Emanuel12309/?",
+        //     rol: "admin",
+        //     ci: "27571718",
+        //     birdDate: "1998-10-18",
+        //     phoneNumber: "04126022414",
+        //   },
+        // ]),
 
 
         await subcategoryModel.insertMany([
@@ -46,6 +46,8 @@ mongoose.connect(
               "66885e41128f5eb2ede6d8a9",
               "67885e41128f5eb2ede6d8a5",
               "68885e41128f5eb2ede6d8a5",
+              "68885e41128f5eb3ede6d8a1",
+              "68885e41128f5eb5ede6d8a1"
             ]
           },
           {
@@ -55,6 +57,8 @@ mongoose.connect(
               "59885e41128f5eb2ede6d8a6",
               "58885e41128f5eb2ede6d8a6",
               "57885e41128f5eb2ede6d8a6",
+              "57285e41128f5eb2ede6d8a6",
+              "57185e41128f5eb2ede6d8a6"
             ]
           },
           {
@@ -66,17 +70,21 @@ mongoose.connect(
               "47885e41128f5eb2ede6d8a6",
               "46885e41128f5eb2ede6d8a6",
               "45885e41128f5eb2ede6d8a6",
+              "45885e41328f5eb2ede6d8a6",
+              "45885e41828f5eb2ede6d8a6"
             ]
           },
           {
             _id: "75885e41128f5eb2ede6d8a6",
-            name: "proteccion social",
+            name: "proteccion civil",
             tiposId:[
               "70885e41128f5eb2ede6d8a6",
               "71885e41128f5eb2ede6d8a6",
               "72885e41128f5eb2ede6d8a6",
               "73885e41128f5eb2ede6d8a6",
               "74885e41128f5eb2ede6d8a6",
+              "74885e41128f5eb2ede6d8a5",
+              "74885e41128f5eb2ede6d8a3"
             ]
           }
         ]),
@@ -133,6 +141,16 @@ mongoose.connect(
             name: "consulta medica",
             subcategoriaId:"66885e41128f5eb2ede6d8a5"
           }, 
+          {
+             _id: "68885e41128f5eb3ede6d8a1", 
+            name: "servicio de ambulancia",
+            subcategoriaId:"66885e41128f5eb2ede6d8a5"
+          }, 
+          {
+             _id: "68885e41128f5eb5ede6d8a1", 
+            name: "donación",
+            subcategoriaId:"66885e41128f5eb2ede6d8a5"
+          }, 
            //   vivienda y habitat
           {
             _id: "59885e41128f5eb2ede6d8a6", 
@@ -145,10 +163,21 @@ mongoose.connect(
            subcategoriaId:"66885e41128f5eb2ede6d8a6"
           },
           {
-            _id: "57885e41128f5eb2ede6d8a6", 
+            _id: "57385e41128f5eb2ede6d8a6", 
            name: "equipamiento",
            subcategoriaId:"66885e41128f5eb2ede6d8a6"
           },
+          {
+            _id: "57285e41128f5eb2ede6d8a6", 
+           name: "vivienda digna",
+           subcategoriaId:"66885e41128f5eb2ede6d8a6"
+          },
+          {
+            _id: "57185e41128f5eb2ede6d8a6", 
+           name: "donación",
+           subcategoriaId:"66885e41128f5eb2ede6d8a6"
+          },
+
           //economia
           {
             _id: "49885e41128f5eb2ede6d8a6", 
@@ -175,7 +204,17 @@ mongoose.connect(
            name: "financiamiento",
            subcategoriaId:"66885e41128f5eb2ede6d8a7"
           },
-          //proteccion social
+          {
+            _id: "45885e41328f5eb2ede6d8a6", 
+           name: "emprendimiento",
+           subcategoriaId:"66885e41128f5eb2ede6d8a7"
+          },
+          {
+            _id: "45885e41828f5eb2ede6d8a6", 
+           name: "donación",
+           subcategoriaId:"66885e41128f5eb2ede6d8a7"
+          },
+          //proteccion civil
           {
             _id: "70885e41128f5eb2ede6d8a6", 
            name: "servicios publicos",
@@ -199,6 +238,16 @@ mongoose.connect(
           {
             _id: "74885e41128f5eb2ede6d8a6", 
            name: "alimentacion",
+           subcategoriaId:"75885e41128f5eb2ede6d8a6"
+          },
+          {
+            _id: "74885e41128f5eb2ede6d8a5", 
+           name: "educación y cultura",
+           subcategoriaId:"75885e41128f5eb2ede6d8a6"
+          },
+          {
+            _id: "74885e41128f5eb2ede6d8a3", 
+           name: "seguridad y prevención",
            subcategoriaId:"75885e41128f5eb2ede6d8a6"
           },
         ]),
