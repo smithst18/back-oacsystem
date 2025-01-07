@@ -6,7 +6,7 @@ import paginate from 'mongoose-paginate-v2';
 const caseSchema  = new Schema<CaseI>({
   subId:{
     type:Number,
-    unique:true,
+    unique:false,
     trim:true,
   },
   remitente:{
