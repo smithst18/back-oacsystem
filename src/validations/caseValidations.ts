@@ -179,14 +179,6 @@ export const validCase = [
 ];
 
 export const validOptionalCase = [
-  
-  check("subId")
-  .optional()
-  .notEmpty()
-  .withMessage('No debe estar vacío')
-  .isNumeric()
-  .withMessage('debe ser un numero'),
-
   check("fechaDeApertura")
   .optional()
   .trim()
