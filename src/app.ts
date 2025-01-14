@@ -4,17 +4,24 @@ import routes from "./routes";
 // Serv instance
 const app = express(); // Use type annotation for app
 
+
+// CORS configuration
+const corsOptions = {
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: false, // Deshabilitar credenciales con wildcard
+};
+app.use(cors(corsOptions)); // Assuming cors is already imported or a global function
+
+
 // Request to JSON
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// CORS configuration
-app.use(cors()); // Assuming cors is already imported or a global function
-
 // Config for public files
-        //nombre de la ruta               //ruta carpeta de la cual se esta haciendo recurso publico
+//nombre de la ruta               //ruta carpeta de la cual se esta haciendo recurso publico
 app.use('/public',express.static(__dirname + '/public/files'));
-
 // Routes
 
 // user routes

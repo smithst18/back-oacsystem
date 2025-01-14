@@ -3,8 +3,9 @@ import { dbConexion } from "./db/dbConnection";
 import dotenv from 'dotenv';
 dotenv.config();
 
-const port = process.env.PORT || 3000;
-if (!port) {
+const PORT = process.env.PORT || 3000;
+
+if (!PORT) {
     console.error('Error: Missing PORT environment variable');
 }
 
@@ -12,6 +13,6 @@ if (!port) {
     const dbAlive = await dbConexion();
   
     if (dbAlive) {
-        app.listen(port, () => console.log(` Server Running on port ${port}`));
+        app.listen(PORT, () => console.log(` Server Running on port ${PORT}`));
     }
 })();
