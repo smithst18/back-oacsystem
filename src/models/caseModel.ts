@@ -145,7 +145,6 @@ const caseSchema  = new Schema<CaseI>({
     type:String,
     trim:true,
     enum:[
-      "en espera",
       "administrativa",
       "Servicio desconcentrado fondo negro primero",
       "partida de donacion a tercero",
@@ -154,7 +153,6 @@ const caseSchema  = new Schema<CaseI>({
       "donacion",
       "no procede",
     ],
-    default:"en espera"
   },
   enteRedireccionado:{
     type:String,
