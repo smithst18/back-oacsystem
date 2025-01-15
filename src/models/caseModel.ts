@@ -12,18 +12,20 @@ const caseSchema  = new Schema<CaseI>({
   remitente:{
     type:String,
     enum: [
-      "O.A.C","ministro",
+      "O.A.C",
+      "ministro",
       "viceministerios",
       "sala situacional",
-      "gabinete ministerial",
-      "abordaje territorial",
-      "venapp","institucion",
       "corpesca",
       "insopesca",
       "pescalba",
       "cenipa",
       "fonpesca",
-      "conppa"
+      "conppa",
+      "gabinete ministerial",
+      "abordaje territorial",
+      "venapp",
+      "institucion",
     ],
     required:true,
     trim:true,
@@ -60,6 +62,10 @@ const caseSchema  = new Schema<CaseI>({
   },
   genero:{
     type:String,
+    enum: [
+      "M",
+      "F"
+    ],
     required:true,
     trim:true,
   },
@@ -85,6 +91,13 @@ const caseSchema  = new Schema<CaseI>({
   },
   tipoBeneficiario:{
     type:String,
+    enum: [
+      "CONPPA",
+      "pescador",
+      "acuicultor",
+      "particular",
+      "institucional",
+    ],
     required:true,
     trim:true,
   },
@@ -113,7 +126,15 @@ const caseSchema  = new Schema<CaseI>({
   status:{
     type:String,
     trim:true,
-    enum:["contacto inicial","conformacion del expediente","proceso de analisis","notificacion al solicitante","en proceso","seguimiento","cerrado"],
+    enum:[
+      "contacto inicial",
+      "conformacion del expediente",
+      "proceso de analisis",
+      "notificacion al solicitante",
+      "en proceso",
+      "seguimiento",
+      "cerrado",
+    ],
     default:"contacto inicial"
   },
   fechaRedireccion:{
@@ -123,7 +144,16 @@ const caseSchema  = new Schema<CaseI>({
   viaResolucion:{
     type:String,
     trim:true,
-    enum:["administrativa","servicio desconcentrado fondo negro primero","remitido","recursos propios","no procede","donacion","partida de donacion a tercero","en espera"],
+    enum:[
+      "en espera",
+      "administrativa",
+      "Servicio desconcentrado fondo negro primero",
+      "partida de donacion a tercero",
+      "remitido",
+      "recursos propios",
+      "donacion",
+      "no procede",
+    ],
     default:"en espera"
   },
   enteRedireccionado:{

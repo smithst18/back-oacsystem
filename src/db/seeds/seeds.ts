@@ -76,7 +76,7 @@ mongoose.connect(
           },
           {
             _id: "75885e41128f5eb2ede6d8a6",
-            name: "proteccion civil",
+            name: "proteccion social",
             tiposId:[
               "70885e41128f5eb2ede6d8a6",
               "71885e41128f5eb2ede6d8a6",
