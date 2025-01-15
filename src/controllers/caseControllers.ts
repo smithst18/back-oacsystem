@@ -275,129 +275,112 @@ export const updateCase = async ( req:Request, res:Response ) =>{
  * @param {*} res 
  */
 
-export const generalStaticsPerMonth = async ( req:Request, res:Response ) =>{
-  try{
+export const generalStaticsPerMonth = async (req: Request, res: Response) => {
+  try {
+    const currentYear = new Date().getUTCFullYear();
+    const startOfYear = new Date(Date.UTC(currentYear, 0, 1, 0, 0, 0)); // 1 de enero del año actual
+    const endOfYear = new Date(Date.UTC(currentYear, 11, 31, 23, 59, 59, 999)); // 31 de diciembre del año actual
 
-    const currentYear = new Date().getFullYear();
-    const startOfYear = new Date(currentYear, 0, 1); // 1 de enero del año actual
-    const endOfYear = new Date(currentYear + 1, 0, 1); // 1 de enero del siguiente año
-
-    const mathQuery : any = {
+    const baseMathQuery: any = {
       createdAt: {
         $gte: startOfYear,
-        $lt: endOfYear
-      }
-    }
-    const getCasesPerMonth = async (status?:string) => {
-      //SEPARAMOS EL QUERY
-      //SI EL STATUS EXISTE LO ANADIMOS AL OBJETO
-      if(status) mathQuery.status = status;
+        $lt: endOfYear,
+      },
+    };
 
-      const values =  await caseModel.aggregate([
+    const getCasesPerMonth = async (status?: string) => {
+      // Crea una copia del mathQuery base
+      const mathQuery = { ...baseMathQuery };
+      if (status) mathQuery.status = status;
+
+      const values = await caseModel.aggregate([
+        { $match: mathQuery },
         {
-          $match: mathQuery
-        },
-        {
-          //PERMITE AGRUPAR POR MESES LOS RESULTADOS ENCONTRADOS EN BASE A SU FECHA DE CREACION
           $group: {
-            _id: { $month: "$createdAt" }, 
-            count: { $sum: 1 }
-          }
+            _id: { $month: "$createdAt" },
+            count: { $sum: 1 },
+          },
         },
+        { $sort: { _id: 1 } },
         {
-          $sort: { _id: 1 } // Ordena por el campo "_id" de forma ascendente (de menor a mayor)
-        },
-        { 
-          //PERMITE MODIFICAR EN BASE AL NUMERO DEL MES Y DEVOLVER EL NOMBRE DEL MES DE MANERA PERSONALIADA
           $project: {
             _id: 0,
             month: {
               $switch: {
                 branches: [
-                  { case: { $eq: ["$_id", 1] }, then:  "Ene" },
-                  { case: { $eq: ["$_id", 2] }, then:  "Feb" },
-                  { case: { $eq: ["$_id", 3] }, then:  "Mar" },
-                  { case: { $eq: ["$_id", 4] }, then:  "Abr" },
-                  { case: { $eq: ["$_id", 5] }, then:  "May" },
-                  { case: { $eq: ["$_id", 6] }, then:  "Jun" },
-                  { case: { $eq: ["$_id", 7] }, then:  "Jul" },
-                  { case: { $eq: ["$_id", 8] }, then:  "Agos" },
-                  { case: { $eq: ["$_id", 9] }, then:  "Sep" },
+                  { case: { $eq: ["$_id", 1] }, then: "Ene" },
+                  { case: { $eq: ["$_id", 2] }, then: "Feb" },
+                  { case: { $eq: ["$_id", 3] }, then: "Mar" },
+                  { case: { $eq: ["$_id", 4] }, then: "Abr" },
+                  { case: { $eq: ["$_id", 5] }, then: "May" },
+                  { case: { $eq: ["$_id", 6] }, then: "Jun" },
+                  { case: { $eq: ["$_id", 7] }, then: "Jul" },
+                  { case: { $eq: ["$_id", 8] }, then: "Agos" },
+                  { case: { $eq: ["$_id", 9] }, then: "Sep" },
                   { case: { $eq: ["$_id", 10] }, then: "Oct" },
                   { case: { $eq: ["$_id", 11] }, then: "Nov" },
                   { case: { $eq: ["$_id", 12] }, then: "Dic" },
                 ],
-                default: "Unknown"
-              }
+                default: "Unknown",
+              },
             },
-            count: 1
-          }
+            count: 1,
+          },
         },
       ]);
+
       const months = values.map((item) => item.month);
       const counts = values.map((item) => item.count);
-      return {
-        months,
-        counts
-      }
-    } 
+      return { months, counts };
+    };
 
-    // REUTILIZAMOS LA FUNCTION
-
-    const openCasesPerMonth = await getCasesPerMonth();
+    // Llamadas a la función reutilizable
     const closedCasesPerMonth = await getCasesPerMonth("cerrado");
+    const openCasesPerMonth = await getCasesPerMonth("contacto inicial");
     const onprocessCasesPerMonth = await getCasesPerMonth("en proceso");
 
-    let quantityPerCategory = await caseModel.aggregate([
-      {
-        $match: mathQuery
-      },
+    // Query para las categorías
+    const quantityPerCategory = await caseModel.aggregate([
+      { $match: baseMathQuery },
       {
         $group: {
-          _id: "$categoria", // Agrupa por el campo "category"
-          count: { $sum: 1 } // Cuenta la cantidad de casos en cada categoría
-        }
+          _id: "$categoria",
+          count: { $sum: 1 },
+        },
       },
       {
         $project: {
-          _id: 0, // Excluye el campo _id del resultado
-          category: "$_id", // Renombra _id a category
-          count: 1 // Mantiene el conteo
-        }
-      }
+          _id: 0,
+          category: "$_id",
+          count: 1,
+        },
+      },
     ]);
 
-
-    const categories = quantityPerCategory.reduce((acc, curr) => {
-      acc.push(curr.category);
-      return acc;
-    }, []);
-    
-    const counts = quantityPerCategory.reduce((acc, curr) => {
-      acc.push(curr.count);
-      return acc;
-    }, []);
+    const categories = quantityPerCategory.map((item) => item.category);
+    const counts = quantityPerCategory.map((item) => item.count);
 
     const quantityPerCategoryValues = {
       counts,
-      categories
+      categories,
+    };
+
+    if (openCasesPerMonth && closedCasesPerMonth && onprocessCasesPerMonth) {
+      return res.status(200).send({
+        closedCasesPerMonth,
+        openCasesPerMonth,
+        onprocessCasesPerMonth,
+        
+        quantityPerCategoryValues,
+      });
+    } else {
+      return res.status(404).send({ msg: "No hay estadísticas para mostrar" });
     }
-
-    if(openCasesPerMonth && closedCasesPerMonth && onprocessCasesPerMonth) return res.status(200).send(
-      { 
-        openCasesPerMonth, 
-        closedCasesPerMonth, 
-        onprocessCasesPerMonth, 
-        quantityPerCategoryValues 
-      }
-    );
-
-    else return handleError(res,404,"No hay Stadisticas para mostrar");
-
-  }catch(error){
-    return res.status(500).send({ msg:'Server error', error });
+  } catch (error) {
+    return res.status(500).send({ msg: "Server error", error });
   }
-}
+};
+
 
 
 /**
