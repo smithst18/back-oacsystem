@@ -1,9 +1,9 @@
-POST http://localhost:3002/api/user/login HTTP/1.1
+POST http://172.17.89.9:3002/api/user/login HTTP/1.1
 content-type: application/json
 
 {
-    "nickName": "zYqVq",
-    "password": "xyxyxyxyxyxy"
+    "ci": "27571718",
+    "password": "Emanuel12309/?"
 }
 
 ###

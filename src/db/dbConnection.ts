@@ -19,10 +19,25 @@ export const dbConexion = async ():Promise<boolean> => {
     console.log('Db connected to ', db.connection.name);
     return true;
 
-  } catch (err) {
+  } catch (err:any) {
 
-    console.log('Db Connection failure:', err);
-    return false;
+     // Manejo de errores detallado
+     console.error('Db Connection failure:', {
+      message: (err as Error).message,
+      name: (err as Error).name,
+      stack: (err as Error).stack,
+    });
     
+    // Si Mongoose genera errores específicos
+    if ('code' in err) {
+      console.error('Mongoose error code:', (err as any).code);
+    }
+
+    if ('reason' in err) {
+      console.error('Mongoose error reason:', (err as any).reason);
+    }
+
+    return false;
   }
+    
 };
