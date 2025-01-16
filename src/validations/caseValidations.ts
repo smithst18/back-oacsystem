@@ -333,6 +333,13 @@ export const validOptionalCase = [
     .isMongoId()
     .withMessage('debe ser mongoid'),
 
+  check("descripcion")
+    .optional()
+    .trim()
+    .isString()
+    .withMessage('debe ser un string'),
+
+
   check("prioridad")
     .optional()
     .trim()
