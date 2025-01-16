@@ -12,6 +12,7 @@ const corsOptions = {
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: false, // Deshabilitar credenciales con wildcard
 };
+
 app.use(cors(corsOptions)); // Assuming cors is already imported or a global function
 
 
@@ -22,6 +23,8 @@ app.use(express.urlencoded({ extended: true }));
 // Config for public files
 //nombre de la ruta               //ruta carpeta de la cual se esta haciendo recurso publico
 app.use('/public',express.static(__dirname + '/public/files'));
+// Configuración para archivos estáticos en public/html
+app.use('/html', express.static(__dirname + '/public/html'));
 // Routes
 
 // user routes
@@ -30,9 +33,11 @@ app.use('/api/user', routes.userRouts);
 app.use('/api/diary', routes.diaryRouts); 
 // cases routes
 app.use('/api/cases', routes.casesRouts); 
-// categories routes
-app.use('/api/subCategories', routes.subcategoryRouts);
 // subcategories routes
+app.use('/api/subCategories', routes.subcategoryRouts);
+// types routes
 app.use('/api/types', routes.typesRouts);
+// server routes
+app.use('/api/server', routes.serverRouts);
 
 export default app;
