@@ -626,6 +626,7 @@ export const generateWordOneCase = async (req: Request, res: Response) => {
       SUBCATEGORIA: caseWithSubCategory.subCategoriaId.name,
       NOMBRE_OTRA: camelize(caseWithSubCategory.categoria === "quejas" ? "queja" : ""),
       DESCRIPCION: caseWithSubCategory.descripcion,
+      YEAR: new Date().toLocaleString('es-ES', { year: 'numeric' }),
     });
 
     const buf = doc.getZip().generate({ type: 'nodebuffer' });
@@ -669,7 +670,7 @@ export const generateWordOneCase = async (req: Request, res: Response) => {
  * @param {*} req 
  * @param {*} res 
  */
-export const generateExcelClosedCase = async (req: Request, res: Response) => {
+export const generateWordClosedCase = async (req: Request, res: Response) => {
   try {
 
     const { caseId } = matchedData(req);
@@ -700,6 +701,7 @@ export const generateExcelClosedCase = async (req: Request, res: Response) => {
       REMITIDO: foundCase.viaResolucion === "remitido" ? "☑" : "☐",
       RECURSOS_PROPIOS: foundCase.viaResolucion === "recursos propios" ? "☑" : "☐",
       NO_PROCEDE: foundCase.viaResolucion === "no procede" ? "☑" : "☐",
+      YEAR: new Date().toLocaleString('es-ES', { year: 'numeric' }),
     });
 
     const buf = doc.getZip().generate({ type: 'nodebuffer' });
