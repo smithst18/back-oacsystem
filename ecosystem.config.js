@@ -9,6 +9,13 @@ const apps = [
       PRIVATE_KEY: "SgH78/?+_01As",
       PUBLIC_URL: "172.17.89.9:3002/public"
     },
+    watch: ["src"],          // Directorios a observar
+    ignore_watch: [          // Directorios a ignorar
+      "node_modules", 
+      "logs",
+      ".git"
+    ],
+    watch_delay: 3000,       // Retardo antes de reiniciar (3 segundos)
   },
 ];
 
