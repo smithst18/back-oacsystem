@@ -15,9 +15,13 @@ export const dbConexion = async ():Promise<boolean> => {
 
   try {
     const db = await connect(MONGO_URI);
-
-    console.log('Db connected to ', db.connection.name);
-    return true;
+    if (db.connection.readyState === 1) {
+      console.log('Db connected to ', db.connection.name);
+      return true
+    } else {
+      console.log("❌ Conexión fallida");
+      return false
+    }
 
   } catch (err:any) {
 

@@ -234,7 +234,7 @@ export const updateCase = async ( req:Request, res:Response ) =>{
     if(!foundCase) return handleError(res,404,"No existe el caso a actualizar");
 
     //validamos el status del documento  validamos el rol del usuario
-    if(foundCase.status === "cerrado" && user.rol !== "auditor"){
+    if(foundCase.status === "cerrado" && user.rol !== "auditor" && foundCase.viaResolucion != "en espera"){
       return handleError(res,403,"No tienes los permisos para editar un caso cerrado");
     }
 
@@ -252,12 +252,28 @@ export const updateCase = async ( req:Request, res:Response ) =>{
       });
     }
 
-    //actualizamos el caso
+    //ACTUALIZACION DE CASO
+
+    // const isUpdatingViaResolucion = 'viaResolucion' in cleanBody && cleanBody.viaResolucion != 'en espera';
+
+    // console.log(isUpdatingViaResolucion)
+    // // Configurar el filtro condicionalmente
+    // const filter = isUpdatingViaResolucion
+    //                 ? { _id: caseId, status: 'cerrado' } // Solo coincide si el status es "cerrado"
+    //                 : { _id: caseId }; // Filtro normal si no se actualiza viaResolucion
+    
+    const filter =  { _id: caseId }; // Filtro normal si no se actualiza viaResolucion
+
     const updatedCase = await caseModel.findOneAndUpdate(
-      { _id: caseId },
+      filter,
       cleanBody,
-      { new: true } // Esta opción devuelve el documento actualizado
+      { new: true }
     ).populate("analistaId tipoId subCategoriaId");
+
+    // Si se intentó actualizar viaResolucion pero no se encontró el caso, lanzar error
+    // if (!updatedCase) {
+    //   return res.status(500).send({ msg:'No se puede actualizar la vía de resolución a menos que el estado esté cerrado.'})
+    // }
 
     if(!updatedCase) return handleError(res,403,"Error al Actualizar el caso");
     else return res.status(200).send({updatedCase});
@@ -337,7 +353,7 @@ export const generalStaticsPerMonth = async (req: Request, res: Response) => {
     // Llamadas a la función reutilizable
     const closedCasesPerMonth = await getCasesPerMonth("cerrado");
     const openCasesPerMonth = await getCasesPerMonth("contacto inicial");
-    const onprocessCasesPerMonth = await getCasesPerMonth("en proceso");
+    const onprocessCasesPerMonth = await getCasesPerMonth("proceso administrativo");
 
     // Query para las categorías
     const quantityPerCategory = await caseModel.aggregate([
@@ -600,9 +616,15 @@ export const generateWordOneCase = async (req: Request, res: Response) => {
     const caseWithSubCategory = foundCase.toObject() as typeof foundCase & { subCategoriaId: SubCategoryI };
 
     const filePath = path.join(__dirname, '../temp/REGISTRO_FORMATO.docx');
-    const content = fs.readFileSync(filePath, 'binary');
-    const zip = new PizZip(content);
-    const doc = new docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
+    const content = fs.readFileSync(filePath); // Buffer nativo
+    
+    // Solución 1: Usar Uint8Array
+    const zip = new PizZip(content as unknown as string | Uint8Array);
+    
+    const doc = new docxtemplater(zip, { 
+        paragraphLoop: true, 
+        linebreaks: true 
+    });
 
     doc.render({
       ID: caseWithSubCategory.subId,
@@ -620,11 +642,10 @@ export const generateWordOneCase = async (req: Request, res: Response) => {
       SECTOR: camelize(caseWithSubCategory.sector),
       PARTICULAR: caseWithSubCategory.tipoBeneficiario === "particular" ? "☑" : "☐",
       INSTITUCIONAL: caseWithSubCategory.tipoBeneficiario === "institucional" ? "☑" : "☐",
-      CONPPA: caseWithSubCategory.tipoBeneficiario === "conppa" ? "☑" : "☐",
+      CONPPA: caseWithSubCategory.tipoBeneficiario.toLowerCase() === "conppa" ? "☑" : "☐",
       PESCADOR_ACUICULTOR: caseWithSubCategory.tipoBeneficiario === "acuicultor" || "pescador" ? "☑" : "☐",
       CATEGORIA: caseWithSubCategory.categoria,
       SUBCATEGORIA: caseWithSubCategory.subCategoriaId.name,
-      NOMBRE_OTRA: camelize(caseWithSubCategory.categoria === "quejas" ? "queja" : ""),
       DESCRIPCION: caseWithSubCategory.descripcion,
       YEAR: new Date().toLocaleString('es-ES', { year: 'numeric' }),
     });
@@ -680,9 +701,12 @@ export const generateWordClosedCase = async (req: Request, res: Response) => {
     if (!foundCase) return handleError(res, 404, "No existe el caso cerrado disponibles");
 
     const filePath = path.join(__dirname, '../temp/ACTA_DE_CIERRE.docx');
-    const content = fs.readFileSync(filePath, 'binary');
-    const zip = new PizZip(content);
-    const doc = new docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
+    const content = fs.readFileSync(filePath); // Buffer nativo
+    const zip = new PizZip(content as unknown as string | Uint8Array);
+    const doc = new docxtemplater(zip, { 
+        paragraphLoop: true, 
+        linebreaks: true 
+    });
 
     doc.render({
       ID: foundCase.subId,
@@ -697,7 +721,7 @@ export const generateWordClosedCase = async (req: Request, res: Response) => {
       CATEGORIA: foundCase.categoria,
       DESCRIPCION: foundCase.descripcion,
       FONDO_NEGRO: foundCase.viaResolucion === "servicio desconcentrado fondo negro primero" ? "☑" : "☐",
-      ADMINISTRATIVA: foundCase.viaResolucion === "administrativa" ? "☑" : "☐",
+      TRAMITADO: foundCase.viaResolucion === "tramitado" ? "☑" : "☐",
       REMITIDO: foundCase.viaResolucion === "remitido" ? "☑" : "☐",
       RECURSOS_PROPIOS: foundCase.viaResolucion === "recursos propios" ? "☑" : "☐",
       NO_PROCEDE: foundCase.viaResolucion === "no procede" ? "☑" : "☐",
@@ -833,4 +857,36 @@ export const especificReport = async ( req:Request, res:Response ) =>{
     return res.status(500).send({ msg:'Server error',error });
   }
 }
+
+
+/**
+ * GET expecific cases by maked query
+ * @param {*} req 
+ * @param {*} res 
+ */
+
+// export const updateValues = async ( req:Request, res:Response ) =>{
+//   try{
+
+//     const casesViaR = await caseModel.updateMany(
+//       { viaResolucion: { $in: ["administrativa", "Tramitado"] } },
+//       { $set: { viaResolucion: "tramitado" } }
+//     ).exec();
+
+//     const casesViaR2 = await caseModel.updateMany({ viaResolucion : "remitido" }, { viaResolucion : "remitido al ente con competencia por la naturaleza del caso" })
+
+//     const casesViaS = await caseModel.updateMany({ status : "en proceso" }, { status : "proceso administrativo" })
+
+//     return res.send({msg:"encontrado", 
+//       cases :{ 
+//         casesViaR,
+//         casesViaR2,
+//         casesViaS,
+//       }
+//     })
+    
+//   }catch(error){
+//     return res.status(500).send({ msg:'Server error',error });
+//   }
+// }
 

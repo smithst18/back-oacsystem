@@ -167,3 +167,12 @@ content-type: application/vnd.openxmlformats-officedocument.wordprocessingml.doc
 ### generate excel
 GET http://localhost:3002/api/cases/especificReport/66bd5a358091bbada5131b7b/1/categoria/salud/12%2F08%2F2024/14%2F08%2F2024 HTTP/1.1
 content-type: application/json
+
+### save case
+PUT http://localhost:3002/api/cases/update/case HTTP/1.1
+content-type: application/json
+
+{
+  "valorAEncontrar" : "administrativa",
+  "valorCambio" : "ssd"
+}

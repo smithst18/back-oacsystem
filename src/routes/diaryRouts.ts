@@ -12,7 +12,7 @@ const router = Router();
 
 //routes definition 
 router.post('/save',validDiary,diaryControllers.save);
-router.get('/getByCaseId/:id',validCaseId ,diaryControllers.getByCaseId);
-router.get('/generateFileOneCase/:id',validCaseId,diaryControllers.generateFileOneCase);
+router.get('/getByCaseId/:caseId',validCaseId ,diaryControllers.getByCaseId);
+router.get('/generateFileOneCase/:caseId',validCaseId,diaryControllers.generateFileOneCase);
 
 export default router;

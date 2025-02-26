@@ -49,14 +49,17 @@ export const save = async ( req:Request, res:Response ) =>{
 
 export const getByCaseId = async ( req:Request, res:Response ) =>{
   try{
-    const { id } = matchedData(req);
-    const caseExist = await caseModel.findById(id);
-    if(!caseExist) return handleError(res,404,"El caso Del que se quiere buscar Diarios NO existe");
-    
-    const diaries = await diaryModel.find({ casoId:id }).select("description createdAt caseStatus");
+    const { caseId } = matchedData(req);
+    if(caseId){
 
-    if(!diaries || diaries.length < 1) return handleError(res,404,"No hay diarios disponibles para este caso");
-    else return res.status(200).send({msg:`Diarios del caso id : ${id}:`, diaries});
+      const caseExist = await caseModel.findById(caseId);
+      if(!caseExist) return handleError(res,404,"El caso Del que se quiere buscar Diarios NO existe");
+      
+      const diaries = await diaryModel.find({ casoId:caseId }).select("description createdAt caseStatus");
+  
+      if(!diaries || diaries.length < 1) return handleError(res,404,"No hay diarios disponibles para este caso");
+      else return res.status(200).send({msg:`Diarios del caso id : ${caseId}:`, diaries});
+    }else return  res.status(500).send({ msg:'No existe el caseId' });
     
   }catch(error){
     return res.status(500).send({ msg:'Server error',error });
@@ -72,15 +75,15 @@ export const getByCaseId = async ( req:Request, res:Response ) =>{
 
 export const generateFileOneCase = async (req: Request, res: Response) => {
   try {
-    const { id } = matchedData(req);
+    const { caseId } = matchedData(req);
     
-    const foundCase: CaseI | null = await caseModel.findById(id).populate("analistaId");
+    const foundCase: CaseI | null = await caseModel.findById(caseId).populate("analistaId");
 
     if (!foundCase) return handleError(res, 404, "No Existe el Caso");
 
-    const diarys : DiaryI[] = await diaryModel.find({ casoId:id, caseStatus:foundCase.status }).select("description");
+    const diarys : DiaryI[] = await diaryModel.find({ casoId:caseId, caseStatus:foundCase.status }).select("description");
 
-    if( !diarys || diarys.length < 1) return handleError(res,403,`No hay diarios registrados para el caso id : ${id}`);
+    if( !diarys || diarys.length < 1) return handleError(res,403,`No hay diarios registrados para el caso id : ${caseId}`);
 
     //convertimos las descripciones de todos los diary en un string facil de usar en el archivo word
     const DiaryString: string = diarys.reduce((accumulator, elm) => {
