@@ -776,16 +776,8 @@ export const especificReport = async ( req:Request, res:Response ) =>{
       fieldValue,
       startDate,
       endDate,
-      page,
       userId,
     } = matchedData(req);
-
-    // console.log(field,
-    //   fieldValue,
-    //   startDate,
-    //   endDate,
-    //   page)
-
     const userExist = await userModel.findById(userId);
     //if user dont exist return error
     if(!userExist) return handleError(res,404,"Usuario inexistente");
@@ -793,35 +785,12 @@ export const especificReport = async ( req:Request, res:Response ) =>{
     const mongoStartDate = tomongoDate(startDate);
     const mongoEndDate = tomongoDate(endDate);
 
-    const myCustomLabels = {
-      totalDocs: 'totalDocs',
-      docs: 'cases',
-      limit: 'perPage',
-      page: 'currentPage',
-      nextPage: 'next',
-      prevPage: 'prev',
-      totalPages: 'totalPages',
-      pagingCounter: 'pagingCounter',
-      meta: 'paginator',
-    };
-
-    const options = {
-      page: parseInt(page),
-      limit: 10,
-      customLabels: myCustomLabels,
-      select:["_id","subId","cedulaBeneficiario","status","estado","categoria"],
-      populate:[{
-        path: 'analistaId',
-        select:["name","_id"]
-      }]
-    };
-
     let query: any = {};
 
     // numeric field list
     const numericFields = ['edad', 'otroCampoNumerico'];
 
-    if (field && fieldValue) {
+    if (field && fieldValue && field != "analista") { 
       // if the field is numeric
       if (numericFields.includes(field)) {
         query[field] = Number(fieldValue);  // comparation if is numeric
@@ -831,25 +800,43 @@ export const especificReport = async ( req:Request, res:Response ) =>{
       }
     }
 
+    //codigo para cuando la busqueda es por analista
+    if (field === "analista" && fieldValue && (userExist.rol == 'auditor' || userExist.rol == 'admin')) {
+      // Validar formato numérico si aplica
+      if (typeof fieldValue !== "string" || !/^\d+$/.test(fieldValue)) {
+          return handleError(res, 400, "Cédula debe contener solo números");
+      }
+
+      const user = await userModel.findOne({ ci: fieldValue });
+      if (!user) return handleError(res, 404, "Analista no encontrado");
+      
+      query.analistaId = user._id;
+    }
+
     // filter dates
     if (startDate && endDate) {
+      // Ajustar fechas para cubrir todo el día
+      const startOfDay = new Date(mongoStartDate);
+      startOfDay.setUTCHours(0, 0, 0, 0); // 00:00:00.000
+  
+      const endOfDay = new Date(mongoEndDate);
+      endOfDay.setUTCHours(23, 59, 59, 999); // 23:59:59.999
+  
       query.createdAt = {
-        $gte: mongoStartDate,
-        $lte: mongoEndDate
+          $gte: startOfDay,
+          $lte: endOfDay
       };
     }
     
-    const paginatedData =  await caseModel.paginate(query, options, (err:any, result:any) => {
-      if (err) {
+    const data = await caseModel.find(query)
+                        .select(["_id","subId","estado","tipoBeneficiario","categoria","prioridad","genero","edad","analistaId"])
+                        .populate({
+                          path: 'analistaId',
+                          select:["name","_id","ci"]
+                        })
+    if(data && data.length > 0 ) {
 
-        return console.log("Error paginando los Datos",err);
-
-      }else return result
-    });
-
-    if(paginatedData && paginatedData.cases && Array.isArray(paginatedData.cases) && paginatedData.cases.length > 0 ) {
-
-      return res.status(200).send({ paginatedData });
+      return res.status(200).send({ paginatedData:data });
     
     }else return handleError(res,404,"No se ha encontrado casos");
 
@@ -857,36 +844,3 @@ export const especificReport = async ( req:Request, res:Response ) =>{
     return res.status(500).send({ msg:'Server error',error });
   }
 }
-
-
-/**
- * GET expecific cases by maked query
- * @param {*} req 
- * @param {*} res 
- */
-
-// export const updateValues = async ( req:Request, res:Response ) =>{
-//   try{
-
-//     const casesViaR = await caseModel.updateMany(
-//       { viaResolucion: { $in: ["administrativa", "Tramitado"] } },
-//       { $set: { viaResolucion: "tramitado" } }
-//     ).exec();
-
-//     const casesViaR2 = await caseModel.updateMany({ viaResolucion : "remitido" }, { viaResolucion : "remitido al ente con competencia por la naturaleza del caso" })
-
-//     const casesViaS = await caseModel.updateMany({ status : "en proceso" }, { status : "proceso administrativo" })
-
-//     return res.send({msg:"encontrado", 
-//       cases :{ 
-//         casesViaR,
-//         casesViaR2,
-//         casesViaS,
-//       }
-//     })
-    
-//   }catch(error){
-//     return res.status(500).send({ msg:'Server error',error });
-//   }
-// }
-

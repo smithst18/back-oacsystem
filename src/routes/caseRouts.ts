@@ -43,6 +43,6 @@ router.get('/generalStaticsPerMonth',caseControllers.generalStaticsPerMonth);
 router.get('/getCasesInExcel',caseControllers.generateExcel);
 router.get('/generateExcelOneCase/:caseId',validCaseId,caseControllers.generateWordOneCase);
 router.get('/generateExcelClosedCase/:caseId',validCaseId,caseControllers.generateWordClosedCase);
-router.get('/especificReport/:userId/:field/:fieldValue/:startDate/:endDate/:page',validUserId,validReportFilter,caseControllers.especificReport);
+router.get('/especificReport/:userId/:field/:fieldValue/:startDate/:endDate',validUserId,validReportFilter,caseControllers.especificReport);
 
 export default router;

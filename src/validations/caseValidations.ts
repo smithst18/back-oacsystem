@@ -408,12 +408,6 @@ export const validCaseSearch = [
 
 
 export const validReportFilter = [
-  check("page")
-  .trim()
-  .notEmpty()
-  .withMessage('No debe estar vacío')
-  .isNumeric()
-  .withMessage('debe ser un number'),
 
   check("field")
   .trim()
