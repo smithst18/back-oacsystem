@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon src/server.ts ",
-    "dev": "tsc --watch --outDir dist && node dist/server.js"
+    "dev": "tsc --watch --outDir dist && node dist/server.js",
+    "seed": "ts-node src/db/seeds/seeds.ts"
   },
   "author": "E.A.A",
   "license": "ISC",

@@ -95,7 +95,7 @@ export const getCases = async ( req:Request, res:Response ) =>{
      const endOfYear = new Date(currentYear + 1, 0, 1); // 1 de enero del siguiente año
  
      // Agrega el filtro de fecha al query
-     query.createdAt = { $gte: startOfYear, $lt: endOfYear };
+    //  query.createdAt = { $gte: startOfYear, $lt: endOfYear };
 
     if (search && search !== undefined && search !== "undefined" && search !== null) {
       // Expresión regular para buscar con o sin el prefijo "V-"
@@ -109,6 +109,14 @@ export const getCases = async ( req:Request, res:Response ) =>{
         $or: [
           // Solo incluir el campo `subId` si la búsqueda es numérica
           ...(isNumeric ? [{ subId: search }] : []),
+          ...(isNumeric
+            ? [{
+                createdAt: {
+                  $gte: new Date(`${search}-01-01T00:00:00.000Z`),
+                  $lt: new Date(`${Number(search) + 1}-01-01T00:00:00.000Z`)
+                }
+              }]
+            : []),
           { remitente: { $regex: new RegExp(`^${search}`, "i") } }, // Búsqueda en remitente
           { nombreSolicitante: { $regex: new RegExp(`^${search}`, "i") } }, // Búsqueda en nombreSolicitante
           { cedulaSolicitante: { $regex: regexSearch } }, // Búsqueda flexible en cedulaSolicitante
