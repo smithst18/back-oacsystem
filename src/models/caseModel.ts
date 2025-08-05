@@ -145,10 +145,10 @@ const caseSchema  = new Schema<CaseI>({
     type:String,
     trim:true,
     enum:[
-      "administrativa",
+      "tramitado",
       "Servicio desconcentrado fondo negro primero",
       "partida de donacion a tercero",
-      "remitido",
+      "remitido al ente con competencia por la naturaleza del caso",
       "recursos propios",
       "donacion",
       "no procede",

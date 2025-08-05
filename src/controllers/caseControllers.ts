@@ -728,6 +728,7 @@ export const generateWordClosedCase = async (req: Request, res: Response) => {
       NOMBRE_BENEFICIARIO: camelize(foundCase.nombreBeneficiario),
       CATEGORIA: foundCase.categoria,
       DESCRIPCION: foundCase.descripcion,
+      DONACION_TERCEROS: foundCase.viaResolucion === "partida de donacion a tercero" ? "☑" : "☐",
       FONDO_NEGRO: foundCase.viaResolucion === "servicio desconcentrado fondo negro primero" ? "☑" : "☐",
       TRAMITADO: foundCase.viaResolucion === "tramitado" ? "☑" : "☐",
       REMITIDO: foundCase.viaResolucion === "remitido" ? "☑" : "☐",
