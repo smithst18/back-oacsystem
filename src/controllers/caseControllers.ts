@@ -655,7 +655,7 @@ export const generateWordOneCase = async (req: Request, res: Response) => {
       CATEGORIA: caseWithSubCategory.categoria,
       SUBCATEGORIA: caseWithSubCategory.subCategoriaId.name,
       DESCRIPCION: caseWithSubCategory.descripcion,
-      YEAR: new Date().toLocaleString('es-ES', { year: 'numeric' }),
+      YEAR: new Date(caseWithSubCategory.createdAt).toLocaleString('es-ES', { year: 'numeric' }),
     });
 
     const buf = doc.getZip().generate({ type: 'nodebuffer' });
